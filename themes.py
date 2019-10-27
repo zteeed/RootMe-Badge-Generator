@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
-# Author: HexPandaa
-
-from typing import Tuple
 from os.path import abspath
+from typing import Tuple
 
 
 class Theme:
-
     background_color: Tuple[int, int, int]
     username_color: Tuple[int, int, int]
     ranking_color: Tuple[int, int, int]
@@ -16,7 +12,6 @@ class Theme:
 
 
 class LightTheme(Theme):
-
     background_color = (255, 255, 255)
     username_color = (0, 0, 0)
     ranking_color = (38, 38, 38)
@@ -26,7 +21,6 @@ class LightTheme(Theme):
 
 
 class DarkTheme(Theme):
-
     background_color = (69, 69, 69)
     username_color = (255, 255, 255)
     ranking_color = (255, 241, 227)

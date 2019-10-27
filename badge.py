@@ -1,20 +1,14 @@
-# -*- coding: utf-8 -*-
-# Author: HexPandaa
-# Inspired by: https://github.com/RemiGascou/small-projects/blob/master/Python/RootMe_badge/get_rootme_badge.py
+from os.path import dirname, isdir, abspath
+from typing import Union
 
 from PIL import Image
-from PIL import ImageFont
 from PIL import ImageDraw
-
-from os.path import dirname, isdir, isfile, abspath
-from os import makedirs
-from typing import Union
+from PIL import ImageFont
 
 import themes
 
 
 class Badge:
-
     THEMES = {
         "light": themes.LightTheme,
         "dark": themes.DarkTheme
@@ -51,7 +45,8 @@ class Badge:
 
     def __draw_profile_picture(self) -> None:
         pp: Image.Image = Image.open(self.pp)
-        size = int(self.height * (2/3)), int(self.height * (2/3))  # We want the pp to be 2/3 the height of the badge
+        size = int(self.height * (2 / 3)), int(
+            self.height * (2 / 3))  # We want the pp to be 2/3 the height of the badge
         pp = pp.resize(
             size=size,
             resample=Image.BICUBIC
@@ -66,7 +61,7 @@ class Badge:
         font = ImageFont.truetype(self.FONT, size=size)
         d = ImageDraw.Draw(self.badge)
         offset = (
-            int(self.height * (2/3)) + int(self.height * 0.2),  # The size of the pp, plus spacing between the objects
+            int(self.height * (2 / 3)) + int(self.height * 0.2),  # The size of the pp, plus spacing between the objects
             int(self.height * 0.1)  # Spacing from the top of the badge
         )
         d.text(
@@ -81,7 +76,7 @@ class Badge:
         font = ImageFont.truetype(self.FONT, size=size)
         d = ImageDraw.Draw(self.badge)
         offset = (
-            int(self.height * (2/3)) + int(self.height * 0.2),  # The size of the pp, plus spacing between the objects
+            int(self.height * (2 / 3)) + int(self.height * 0.2),  # The size of the pp, plus spacing between the objects
             int(self.height * 0.35)  # Spacing from the top of the badge + size of the username + padding
         )
         d.text(
@@ -92,7 +87,7 @@ class Badge:
         )
 
     def __draw_logo(self) -> None:
-        size = int(self.height * (1/3)), int(self.height * (1/3))
+        size = int(self.height * (1 / 3)), int(self.height * (1 / 3))
         logo: Image.Image = Image.open(self.theme.logo)
         logo = logo.resize(
             size=size,
@@ -114,7 +109,7 @@ class Badge:
         d = ImageDraw.Draw(self.badge)
         offset = (
             int(self.height * 0.1),  # Spacing from the left side of the badge
-            int(self.height * 0.8)   # Spacing from the bottom of the badge
+            int(self.height * 0.8)  # Spacing from the bottom of the badge
         )
         d.text(
             xy=offset,

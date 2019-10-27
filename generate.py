@@ -1,14 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-# Author: HexPandaa
-# Original idea from Podalirius (https://www.root-me.org/?page=forum&id_thread=12859)
-
 import argparse
 import textwrap
-from rootme import *
-from badge import Badge
-from os.path import dirname, isdir, isfile, abspath
 from os import makedirs, remove
+from os.path import dirname, isdir, isfile, abspath
+
+from badge import Badge
+from rootme import *
 
 
 def download_file(session: Session, url: str, save_path: str) -> None:

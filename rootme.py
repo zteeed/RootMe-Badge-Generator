@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-# Author: HexPandaa
-
+from random import randrange
 from re import findall
+from time import sleep
+
 from requests import Session
 from requests.utils import quote
-from time import sleep
-from random import randrange
 
 
 class RootMe:
@@ -180,6 +178,7 @@ class UserNotFoundError(Exception):
 
 if __name__ == '__main__':
     from pprint import pprint
+
     rm = RootMe()
     data = rm.get_user_stats("HexPandaa")
     pprint(data)
