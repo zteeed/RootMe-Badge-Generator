@@ -1,6 +1,10 @@
-__pycache__/
-*.py[cod]
+# pycache
+__pycache__
+*/__pycache__
+
+# PyCharm
 .idea/
 venv/
-/*.png
-/*.jpg
+
+# env
+.env
