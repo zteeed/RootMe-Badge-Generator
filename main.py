@@ -3,7 +3,7 @@ import os
 from typing import Dict
 
 import requests
-from flask import Flask, flash, render_template, request
+from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
 
@@ -56,6 +56,11 @@ def index():
 
     data = _extract_data(data[0])
     return render_template('badge.html', data=data)
+
+
+@app.route('/storage_server/<string:filename>')
+def serve_files(filename):
+    return send_from_directory(f'storage_server', filename)
 
 
 if __name__ == '__main__':
