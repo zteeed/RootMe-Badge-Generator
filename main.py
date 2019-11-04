@@ -4,6 +4,7 @@ import os
 from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
+from src.storage import make_storage
 from src.parser import extract_data
 from src.http_client import http_get
 
@@ -37,6 +38,7 @@ def index():
 
     data = data[0]
     data = extract_data(data)
+    make_storage(data)
     return render_template('badge.html', data=data)
 
 
