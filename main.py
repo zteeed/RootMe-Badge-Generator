@@ -1,10 +1,10 @@
 import json
 import os
-from typing import Dict
 
 from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
+from src.parser import extract_data
 from src.http_client import http_get
 
 app = Flask(__name__)
@@ -12,25 +12,6 @@ app.config.from_object(Config)
 
 URL = os.environ.get('URL')
 API_URL = os.environ.get('API_URL')
-
-s = requests.session()
-
-
-def _extract_data(data: Dict) -> Dict:
-    top = 100 * data["ranking"] / data["ranking_tot"]
-    top = '{0:.2f}'.format(top)
-    return {
-        'url': URL,
-        'name': data['pseudo'],
-        'avatar': 'https://www.root-me.org/local/cache-vignettes/L64xH64/auton236284-2442c.jpg',
-        'score': data['score'],
-        'rank': data['ranking_category'],
-        'top': f'{top}%',
-        'challenge': {
-            'solved': data['nb_challenges_solved'],
-            'total': data['nb_challenges_tot']
-        }
-    }
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -54,7 +35,8 @@ def index():
         flash(f'{username} is not a valid RootMe username.', 'error')
         return render_template('index.html')
 
-    data = _extract_data(data[0])
+    data = data[0]
+    data = extract_data(data)
     return render_template('badge.html', data=data)
 
 
