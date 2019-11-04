@@ -24,7 +24,6 @@ class Badge:
         self.theme = self.THEMES.get(theme, "light")
         self.width = width
         self.height = height
-
         self.badge: Union[Image.Image, None] = None
 
     @classmethod
@@ -151,21 +150,21 @@ class Badge:
         self.badge.save(filepath)
 
 
-def make_static_badge(data: Dict, theme: str, outfile: str) -> None:
+def make_static_badge(data: Dict, theme: str, folder_path: str) -> None:
     badge = Badge(
-        pseudo=data["username"],
-        profile_picture="pp.png",
+        pseudo=data["name"],
+        profile_picture=f"{folder_path}/avatar.jpg",
         score=data["score"],
         title=data["rank"],
         ranking=data["ranking"],
-        total_users=data["total_users"],
+        total_users=data["ranking_tot"],
         theme=theme
     )
     badge.create()
-    badge.save(outfile)
+    badge.save(f'{folder_path}/static_badge_{theme}.png')
 
 
-def make_static_badge(data: Dict, outfile: str) -> None:
+def make_static_badges(data: Dict, folder_path: str) -> None:
     themes = Badge.get_themes()
     for theme in themes:
-        make_static_badge(data, theme, outfile)
+        make_static_badge(data, theme, folder_path)
