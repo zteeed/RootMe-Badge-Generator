@@ -13,6 +13,8 @@ def extract_data(data: Dict) -> Dict:
         'avatar_url': 'https://www.root-me.org/local/cache-vignettes/L64xH64/auton236284-2442c.jpg',
         'score': data['score'],
         'rank': data['ranking_category'],
+        'ranking': data['ranking'],
+        'ranking_tot': data['ranking_tot'],
         'top': f'{top}%',
         'challenge': {
             'solved': data['nb_challenges_solved'],
