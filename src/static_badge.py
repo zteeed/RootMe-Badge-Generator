@@ -1,32 +1,20 @@
 from os.path import dirname, isdir, abspath
-from typing import Union
+from typing import Dict, Union
 
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL import Image, ImageDraw, ImageFont
 
-import themes
+from src.themes import LightTheme, DarkTheme
 
 
 class Badge:
     THEMES = {
-        "light": themes.LightTheme,
-        "dark": themes.DarkTheme
+        "light": LightTheme,
+        "dark": DarkTheme
     }
-    FONT = "assets/BebasNeue-Regular.ttf"
+    FONT = "storage_server/BebasNeue-Regular.ttf"
 
-    def __init__(self,
-                 pseudo: str,
-                 profile_picture: str,
-                 score: int,
-                 title: str,
-                 ranking: int,
-                 total_users: int,
-                 theme: str = "light",
-                 width: int = 500,
-                 height: int = 200
-                 ) -> None:
-
+    def __init__(self, pseudo: str, profile_picture: str, score: int, title: str, ranking: int, total_users: int,
+                 theme: str = "light", width: int = 500, height: int = 200) -> None:
         self.pseudo = pseudo
         self.pp = profile_picture
         self.score = score
@@ -162,7 +150,22 @@ class Badge:
             self.create()
         self.badge.save(filepath)
 
-    def show(self, viewer: str = None) -> None:
-        if self.badge is None:
-            self.create()
-        self.badge.show(command=viewer)
+
+def make_static_badge(data: Dict, theme: str, outfile: str) -> None:
+    badge = Badge(
+        pseudo=data["username"],
+        profile_picture="pp.png",
+        score=data["score"],
+        title=data["rank"],
+        ranking=data["ranking"],
+        total_users=data["total_users"],
+        theme=theme
+    )
+    badge.create()
+    badge.save(outfile)
+
+
+def make_static_badge(data: Dict, outfile: str) -> None:
+    themes = Badge.get_themes()
+    for theme in themes:
+        make_static_badge(data, theme, outfile)

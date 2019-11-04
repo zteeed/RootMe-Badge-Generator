@@ -17,7 +17,7 @@ class LightTheme(Theme):
     ranking_color = (38, 38, 38)
     title_color = (255, 172, 18)
     score_color = (34, 186, 0)
-    logo = abspath("assets/skull-black.png")
+    logo = abspath("storage_server/skull-black.png")
 
 
 class DarkTheme(Theme):
@@ -26,4 +26,4 @@ class DarkTheme(Theme):
     ranking_color = (255, 241, 227)
     title_color = (230, 120, 2)
     score_color = (34, 186, 0)
-    logo = abspath("assets/skull-white.png")
+    logo = abspath("storage_server/skull-white.png")
