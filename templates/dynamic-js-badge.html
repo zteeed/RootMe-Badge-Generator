@@ -1,0 +1,56 @@
+<div style="width: 220px; height:50px; background-color: #343c41; border-radius:4px; text-align: left;
+            background-image: url({{ data.url }}/assets/skull-white.png); background-size: 20px 20px;
+            background-position: right 2px bottom 3px; background-repeat: no-repeat;"
+>
+    <style scoped>
+        @font-face {
+            font-family: "Roboto";font-style: normal;font-weight: 400;
+            src: url({{ data.url }}/assets/htb-font.woff2)
+            format("woff2");
+        }.rootme_font {
+            font-family: "Roboto", monospace;
+        }.rootme_nickname {
+            color: #ffffff;font-size: 12px;font-weight: bold;
+        }.rootme_points {
+            color: #4bb7ef;font-size: 10px; position: relative; right: 11px;
+        }.rootme_top {
+            color: #ffae01;font-size: 10px; position: relative; right: 20px;
+        }.rootme_ranking {
+            color: #ffffff;font-size: 10px;
+        }.rootme_line {
+            line-height: 12px;margin: 0px;padding: 0px;
+        }.rootme_link {
+            color: #9acc14;font-size: 0.6em;text-decoration: none;
+        }.rootme_link:hover {
+            color: #9acc14;font-size: 0.6em;text-decoration: underline;
+        }.rootme_link:visited {
+            color: #9acc14;
+        }.rootme_rank{
+            color: #ffffff;font-size: 11px;
+        }.rootme_icon_target{
+            position: relative;top: 2px;right: 4px;width: 10px;heigh:10px;
+        }.rootme_icon_star{
+            position: relative;top: 1.8px;right: 14px;width: 10px;heigh:10px;
+        }
+    </style>
+    <div style="width: 40px; height: 40px; border-radius:4px; float:left; margin-top:5px; margin-left:5px;">
+        <img style="width:40px; height: 40px; border-radius:4px;"
+             src="{{ data.avatar }}">
+    </div>
+    <div class="rootme_font" style="float:left; height:40px; padding-left: 5px; margin-top:5px;">
+        <p class="rootme_line">
+            <span class="rootme_nickname">{{ data.name }}</span>
+            <span class="rootme_rank">{{ data.rank }}</span><br>
+        </p>
+        <p class="rootme_line">
+            <span class="rootme_ranking">Score:{{ data.score }}</span>
+            <img src="{{ data.url }}/assets/target.png" class="rootme_icon_target">
+            <span class="rootme_points">{{ data.challenge.solved }}/{{ data.challenge.total }}</span>
+            <img src="{{ data.url }}/assets/star.png" class="rootme_icon_star">
+            <span class="rootme_top">{{ data.top }}</span><br>
+        </p>
+        <p class="rootme_line">
+            <a href="https://www.root-me.org" class="rootme_link">root-me.org</a>
+        </p>
+    </div>
+</div>

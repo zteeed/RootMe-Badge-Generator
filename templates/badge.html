@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<!-- Server -->
+<article id="work" class="wrapper style2">
+    <div class="container">
+        <header>
+            <h2>Badge {{ data.name }}</h2>
+            <!--
+            <p></p>
+            -->
+        </header>
+        <div class="row aln-center">
+            <div class="col-6 col-6-medium col-12-small">
+                <section class="box style1">
+					<h3>Dynamic JS Badge</h3>
+                    <p></p>
+                    {% include "dynamic-js-badge.html" with context %}
+                </section>
+            </div>
+        </div>
+        <footer>
+            <!--
+            <p></p>
+            <a href="#portfolio" class="button large scrolly"></a>
+            -->
+        </footer>
+    </div>
+</article>
+{% endblock %}
