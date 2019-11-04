@@ -1,11 +1,11 @@
 <div style="width: 220px; height:50px; background-color: #343c41; border-radius:4px; text-align: left;
-            background-image: url({{ data.url }}/assets/skull-white.png); background-size: 20px 20px;
+            background-image: url({{ data.url }}/storage_server/skull-white.png); background-size: 20px 20px;
             background-position: right 2px bottom 3px; background-repeat: no-repeat;"
 >
     <style scoped>
         @font-face {
             font-family: "Roboto";font-style: normal;font-weight: 400;
-            src: url({{ data.url }}/assets/htb-font.woff2)
+            src: url({{ data.url }}/storage_server/htb-font.woff2)
             format("woff2");
         }.rootme_font {
             font-family: "Roboto", monospace;
@@ -44,9 +44,9 @@
         </p>
         <p class="rootme_line">
             <span class="rootme_ranking">Score:{{ data.score }}</span>
-            <img src="{{ data.url }}/assets/target.png" class="rootme_icon_target">
+            <img src="{{ data.url }}/storage_server/target.png" class="rootme_icon_target">
             <span class="rootme_points">{{ data.challenge.solved }}/{{ data.challenge.total }}</span>
-            <img src="{{ data.url }}/assets/star.png" class="rootme_icon_star">
+            <img src="{{ data.url }}/storage_server/star.png" class="rootme_icon_star">
             <span class="rootme_top">{{ data.top }}</span><br>
         </p>
         <p class="rootme_line">
