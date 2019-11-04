@@ -2,10 +2,10 @@ import json
 import os
 from typing import Dict
 
-import requests
 from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
+from src.http_client import http_get
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -48,8 +48,8 @@ def index():
         return render_template('index.html')
 
     url = f'{API_URL}/en/{username}/details'
-    r = s.get(url)
-    data = json.loads(r.content)['body']
+    content = http_get(url)
+    data = json.loads(content)['body']
     if data is None:
         flash(f'{username} is not a valid RootMe username.', 'error')
         return render_template('index.html')
