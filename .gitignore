@@ -8,3 +8,6 @@ venv/
 
 # env
 .env
+
+# storage clients
+storage_clients/*
