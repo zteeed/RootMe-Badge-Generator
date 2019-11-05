@@ -1,6 +1,7 @@
 import hashlib
 import os
 from typing import Dict
+import magic
 
 from src.static_badge import make_static_badges
 from src.http_client import http_get
@@ -14,16 +15,20 @@ def _create_folder(name: str) -> str:
     return folder_path
 
 
-def _download_avatar(folder_path: str, avatar_url: str) -> None:
+def _download_avatar(folder_path: str, avatar_url: str) -> str:
     content = http_get(avatar_url)
-    f = open(f'{folder_path}/avatar.jpg', 'wb')
+    file_type = magic.from_buffer(content, mime=True)
+    extension = file_type.split('/')[-1]
+    avatar_path = f'{folder_path}/avatar.{extension}'
+    f = open(avatar_path, 'wb')
     f.write(content)
     f.close()
+    return avatar_path
 
 
 def make_storage(data: Dict) -> None:
     name = data['name']
     folder_path = _create_folder(name)
     avatar_url = data['avatar_url']
-    _download_avatar(folder_path, avatar_url)
-    make_static_badges(data, folder_path)
+    avatar_path = _download_avatar(folder_path, avatar_url)
+    make_static_badges(data, folder_path, avatar_path)

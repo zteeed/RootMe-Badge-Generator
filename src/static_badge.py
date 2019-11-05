@@ -150,10 +150,10 @@ class Badge:
         self.badge.save(filepath)
 
 
-def make_static_badge(data: Dict, theme: str, folder_path: str) -> None:
+def make_static_badge(data: Dict, theme: str, folder_path: str, avatar_path: str) -> None:
     badge = Badge(
         pseudo=data["name"],
-        profile_picture=f"{folder_path}/avatar.jpg",
+        profile_picture=avatar_path,
         score=data["score"],
         title=data["rank"],
         ranking=data["ranking"],
@@ -164,7 +164,7 @@ def make_static_badge(data: Dict, theme: str, folder_path: str) -> None:
     badge.save(f'{folder_path}/static_badge_{theme}.png')
 
 
-def make_static_badges(data: Dict, folder_path: str) -> None:
+def make_static_badges(data: Dict, folder_path: str, avatar_path: str) -> None:
     themes = Badge.get_themes()
     for theme in themes:
-        make_static_badge(data, theme, folder_path)
+        make_static_badge(data, theme, folder_path, avatar_path)

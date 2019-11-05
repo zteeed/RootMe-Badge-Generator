@@ -1,4 +1,5 @@
 flask
 pillow
 python-dotenv
+python-magic
 requests
