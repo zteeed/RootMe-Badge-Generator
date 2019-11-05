@@ -4,7 +4,7 @@ import os
 from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
-from src.storage import make_storage
+from src.storage import make_storage, make_storage_js
 from src.parser import extract_data
 from src.http_client import http_get
 
@@ -38,7 +38,13 @@ def index():
 
     data = data[0]
     data = extract_data(data)
-    save_paths = make_storage(data)
+    # store static png badges
+    save_paths, folder_path, avatar_path = make_storage(data)
+    # update avatar_url with local url
+    data['avatar_url'] = f'{URL}/{avatar_path}'
+    # store dynamic js badge as js script
+    dynamic_js_badge = render_template('dynamic-js-badge.html', data=data)
+    make_storage_js(dynamic_js_badge, folder_path)
     return render_template('badge.html', data=data, save_paths=save_paths)
 
 
