@@ -20,6 +20,12 @@
                     <p>{{ badge.theme }} theme</p>
                     <img class="show_png_badge" src="/{{ badge.path }}" />
                     <pre><code class="html">&lt;img src=&quot;{{ data.url }}/{{ badge.path }}&quot; /&gt;</code></pre>
+                    <br>
+                    <a href="/{{ badge.path }}" class="button large scrolly"
+                       style="font-size: 18px; background-color: #454545">
+                        <i style="padding-right: 15px" class="fa fa-eye" aria-hidden="true"></i>
+                         Show
+                    </a>
                 </section>
             </div>
             {% endfor %}
@@ -32,6 +38,12 @@
                     <p>HackTheBox theme</p>
                     <script src="/{{ js_file_path }}"></script>
                     <pre><code class="html">&lt;script src=&quot;{{ data.url }}/{{ js_file_path }}&quot;&gt;&lt;/script&gt;</code></pre>
+                    <br>
+                    <a href="/{{ js_file_path }}" class="button large scrolly"
+                       style="font-size: 18px; background-color: #454545">
+                        <i style="padding-right: 15px" class="fa fa-eye" aria-hidden="true"></i>
+                        Show
+                    </a>
                 </section>
             </div>
         </div>
