@@ -10,7 +10,7 @@ def extract_data(data: Dict) -> Dict:
     return {
         'url': URL,
         'name': data['pseudo'],
-        'avatar_url': 'https://www.root-me.org/local/cache-vignettes/L64xH64/auton236284-2442c.jpg',
+        'avatar_url': data['avatar_url'],
         'score': data['score'],
         'rank': data['ranking_category'],
         'ranking': data['ranking'],
