@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
 <!-- Server -->
+<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dracula.css') }}"/>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.4.0/highlight.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
 <article id="work" class="wrapper style2">
     <div class="container">
         <header>
@@ -16,6 +19,8 @@
                     <h3>Static PNG Badge</h3>
                     <p>{{ badge.theme }} theme</p>
                     <img src="/{{ badge.path }}" />
+                    <pre><code class="html">&lt;img src=&quot;{{ data.url }}/{{ badge.path }}&quot; /&gt;</code></pre>
+                    </code></pre>
                 </section>
             </div>
             {% endfor %}
