@@ -1,41 +1,6 @@
-ul.ul-with-margin {
-  margin-left: 15%;
-}
-
-p {
-  text-align: justify;
-  margin-bottom: 1em;
-}
-
-ul>li {
-  text-align: left;
-}
-
-span.image.fit {
-    border: 1px solid #EAEAEA;
-    display: block;
-    margin: 8px;
-    text-align: center;
-}
-
-span.image.fit img {
-    border: 1px solid #FFFFFF;
-    margin: 0;
-    background: #F6F6F6;
-    padding: 8px;
-    -moz-box-shadow: 2px 2px 5px #CCCCCC;
-    -webkit-box-shadow: 2px 2px 5px #CCCCCC;
-}
-
-.wrapper {
-  padding-top: 3em;
-}
-
-.box.style1 {
-  /* padding: 3em 2em 3.5em 2em; */
-  padding: 1em 1em 1em 1em; 
-}
-
-h3 {
-  word-break: break-all;
+.show_js_badge {
+  margin-top: 50px;
+  position: relative;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
 }
