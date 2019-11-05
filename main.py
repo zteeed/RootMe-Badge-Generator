@@ -38,13 +38,18 @@ def index():
 
     data = data[0]
     data = extract_data(data)
-    make_storage(data)
-    return render_template('badge.html', data=data)
+    save_paths = make_storage(data)
+    return render_template('badge.html', data=data, save_paths=save_paths)
 
 
 @app.route('/storage_server/<string:filename>')
 def serve_files(filename):
     return send_from_directory(f'storage_server', filename)
+
+
+@app.route('/storage_clients/<string:folder>/<string:filename>')
+def serve_files_clients(folder, filename):
+    return send_from_directory(f'storage_clients/{folder}', filename)
 
 
 if __name__ == '__main__':

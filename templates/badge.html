@@ -10,6 +10,18 @@
             -->
         </header>
         <div class="row aln-center">
+            {% for badge in save_paths %}
+            <div class="col-6 col-6-medium col-12-small">
+                <section class="box style1">
+                    <h3>Static PNG Badge</h3>
+                    <p>{{ badge.theme }} theme</p>
+                    <img src="/{{ badge.path }}" />
+                </section>
+            </div>
+            {% endfor %}
+        </div>
+        <br>
+        <div class="row aln-center">
             <div class="col-6 col-6-medium col-12-small">
                 <section class="box style1">
 					<h3>Dynamic JS Badge</h3>
