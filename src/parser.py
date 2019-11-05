@@ -1,7 +1,7 @@
 import os
 from typing import Dict
 
-URL = os.environ.get('URL')
+from env import URL
 
 
 def extract_data(data: Dict) -> Dict:

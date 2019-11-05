@@ -6,8 +6,5 @@ __pycache__
 .idea/
 venv/
 
-# env
-.env
-
 # storage clients
 storage_clients/*

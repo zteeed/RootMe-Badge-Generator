@@ -5,13 +5,14 @@ from typing import Dict, List, Tuple
 
 import magic
 
+from env import STORAGE_FOLDER
 from src.http_client import http_get
 from src.static_badge import make_static_badges
 
 
 def _create_folder(name: str) -> str:
     folder_name = hashlib.md5(name.encode()).hexdigest()
-    folder_path = f'{os.environ.get("STORAGE_FOLDER")}/{folder_name}'
+    folder_path = f'{STORAGE_FOLDER}/{folder_name}'
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
     return folder_path

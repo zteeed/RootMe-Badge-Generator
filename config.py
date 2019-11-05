@@ -1,6 +1,8 @@
 import os
 
+from env import SECRET_KEY
+
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = SECRET_KEY
     DEBUG = False

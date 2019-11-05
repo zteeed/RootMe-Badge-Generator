@@ -3,6 +3,7 @@ import os
 
 from flask import Flask, flash, render_template, request, send_from_directory
 
+from env import URL, API_URL
 from config import Config
 from src.storage import make_storage, make_storage_js
 from src.parser import extract_data
@@ -10,9 +11,6 @@ from src.http_client import http_get
 
 app = Flask(__name__)
 app.config.from_object(Config)
-
-URL = os.environ.get('URL')
-API_URL = os.environ.get('API_URL')
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -59,4 +57,4 @@ def serve_files_clients(folder, filename):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=80)
