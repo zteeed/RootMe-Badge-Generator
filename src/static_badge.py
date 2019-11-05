@@ -1,5 +1,5 @@
 from os.path import dirname, isdir, abspath
-from typing import Dict, Union
+from typing import Dict, List, Union
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -150,7 +150,7 @@ class Badge:
         self.badge.save(filepath)
 
 
-def make_static_badge(data: Dict, theme: str, folder_path: str, avatar_path: str) -> None:
+def make_static_badge(data: Dict, theme: str, folder_path: str, avatar_path: str) -> str:
     badge = Badge(
         pseudo=data["name"],
         profile_picture=avatar_path,
@@ -161,10 +161,15 @@ def make_static_badge(data: Dict, theme: str, folder_path: str, avatar_path: str
         theme=theme
     )
     badge.create()
-    badge.save(f'{folder_path}/static_badge_{theme}.png')
+    save_path = f'{folder_path}/static_badge_{theme}.png'
+    badge.save(save_path)
+    return save_path
 
 
-def make_static_badges(data: Dict, folder_path: str, avatar_path: str) -> None:
+def make_static_badges(data: Dict, folder_path: str, avatar_path: str) -> List[Dict[str, str]]:
+    save_paths = []
     themes = Badge.get_themes()
     for theme in themes:
-        make_static_badge(data, theme, folder_path, avatar_path)
+        save_path = make_static_badge(data, theme, folder_path, avatar_path)
+        save_paths.append(dict(theme=theme, path=save_path))
+    return save_paths
