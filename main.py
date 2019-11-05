@@ -44,8 +44,8 @@ def index():
     data['avatar_url'] = f'{URL}/{avatar_path}'
     # store dynamic js badge as js script
     dynamic_js_badge = render_template('dynamic-js-badge.html', data=data)
-    make_storage_js(dynamic_js_badge, folder_path)
-    return render_template('badge.html', data=data, save_paths=save_paths)
+    js_file_path = make_storage_js(dynamic_js_badge, folder_path)
+    return render_template('badge.html', data=data, save_paths=save_paths, js_file_path=js_file_path)
 
 
 @app.route('/storage_server/<string:filename>')

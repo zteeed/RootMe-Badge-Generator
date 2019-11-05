@@ -20,7 +20,6 @@
                     <p>{{ badge.theme }} theme</p>
                     <img class="show_png_badge" src="/{{ badge.path }}" />
                     <pre><code class="html">&lt;img src=&quot;{{ data.url }}/{{ badge.path }}&quot; /&gt;</code></pre>
-                    </code></pre>
                 </section>
             </div>
             {% endfor %}
@@ -29,9 +28,10 @@
         <div class="row aln-center">
             <div class="col-6 col-6-medium col-12-small">
                 <section class="box style1">
-					<h3>Dynamic JS Badge</h3>
+                    <h3>Dynamic JS Badge</h3>
                     <p>HackTheBox theme</p>
-                    {% include "dynamic-js-badge.html" with context %}
+                    <script src="/{{ js_file_path }}"></script>
+                    <pre><code class="html">&lt;script src=&quot;{{ data.url }}/{{ js_file_path }}&quot;&gt;&lt;/script&gt;</code></pre>
                 </section>
             </div>
         </div>

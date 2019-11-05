@@ -37,10 +37,11 @@ def make_storage(data: Dict) -> Tuple[List[Dict[str, str]], str, str]:
     return save_paths, folder_path, avatar_path
 
 
-def make_storage_js(dynamic_js_badge: str, folder_path: str) -> None:
+def make_storage_js(dynamic_js_badge: str, folder_path: str) -> str:
     payload = base64.b64encode(dynamic_js_badge.encode()).decode()
     template_string = f'document.write(window.atob("{payload}"))'
     file_path = f'{folder_path}/badge.js'
     f = open(file_path, 'wb')
     f.write(template_string.encode())
     f.close()
+    return file_path
