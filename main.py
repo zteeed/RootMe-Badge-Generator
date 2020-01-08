@@ -8,6 +8,7 @@ from config import Config
 from dotenv import load_dotenv
 from datetime import timedelta
 from timeloop import Timeloop
+from multiprocessing import Process
 
 from src.http_client import RMAPI
 from src.parser import extract_data
@@ -122,4 +123,7 @@ def start_tl():
 
 if __name__ == '__main__':
     api = RMAPI()
+    p = Process(target=start_tl)
+    p.start()
     app.run(host='0.0.0.0', port=80)
+    p.join()
