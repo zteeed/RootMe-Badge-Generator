@@ -1,6 +1,6 @@
+import base64
 import hashlib
 import os
-import base64
 from typing import Dict, List, Tuple
 
 import magic

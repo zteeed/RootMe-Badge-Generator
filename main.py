@@ -1,13 +1,12 @@
 import json
-import os
 
 from flask import Flask, flash, render_template, request, send_from_directory
 
-from env import URL, API_URL
 from config import Config
-from src.storage import make_storage, make_storage_js
-from src.parser import extract_data
+from env import URL, API_URL
 from src.http_client import http_get
+from src.parser import extract_data
+from src.storage import make_storage, make_storage_js
 
 app = Flask(__name__)
 app.config.from_object(Config)

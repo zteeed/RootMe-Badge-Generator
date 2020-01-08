@@ -1,5 +1,5 @@
-from typing import Optional
 import logging
+from typing import Optional
 
 from requests import Session
 from requests.adapters import HTTPAdapter
