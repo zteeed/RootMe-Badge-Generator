@@ -7,6 +7,7 @@ from flask import Flask, flash, render_template, request, send_from_directory
 from config import Config
 from dotenv import load_dotenv
 from datetime import timedelta
+from timeloop import Timeloop
 
 from src.http_client import RMAPI
 from src.parser import extract_data
@@ -14,6 +15,7 @@ from src.storage import make_storage, make_storage_js
 
 
 load_dotenv()
+tl = Timeloop()
 app = Flask(__name__)
 app.config.from_object(Config)
 
@@ -102,6 +104,20 @@ def serve_files(filename):
 @app.route('/storage_clients/<string:folder>/<string:filename>')
 def serve_files_clients(folder, filename):
     return send_from_directory(f'storage_clients/{folder}', filename)
+
+
+@tl.job(interval=timedelta(days=1))
+def update_number_rootme_challenges() -> None:
+    api.update_number_rootme_challenges()
+
+
+@tl.job(interval=timedelta(days=1))
+def update_number_rootme_users() -> None:
+    api.update_number_rootme_challenges()
+
+
+def start_tl():
+    tl.start(block=True)
 
 
 if __name__ == '__main__':
