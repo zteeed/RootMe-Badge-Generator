@@ -4,6 +4,8 @@ COPY ./ /app
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
+VOLUME /app/storage_clients
+
 ENV API_URL https://api.www.root-me.org
 ENV URL https://root-me-badge.hackademint.org
 ENV STORAGE_FOLDER storage_clients
