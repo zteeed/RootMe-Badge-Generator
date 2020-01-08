@@ -1,15 +1,20 @@
 import json
 
+import os
 from flask import Flask, flash, render_template, request, send_from_directory
 
 from config import Config
-from env import URL, API_URL
 from src.http_client import http_get
+from dotenv import load_dotenv
 from src.parser import extract_data
 from src.storage import make_storage, make_storage_js
 
+
+load_dotenv()
 app = Flask(__name__)
 app.config.from_object(Config)
+
+URL = os.environ.get('URL')
 
 
 @app.route('/', methods=['GET', 'POST'])

@@ -5,9 +5,10 @@ from typing import Dict, List, Tuple
 
 import magic
 
-from env import STORAGE_FOLDER
 from src.http_client import http_get
 from src.static_badge import make_static_badges
+
+STORAGE_FOLDER = os.environ.get('STORAGE_FOLDER')
 
 
 def _create_folder(name: str) -> str:

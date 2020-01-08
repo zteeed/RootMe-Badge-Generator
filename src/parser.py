@@ -1,13 +1,11 @@
 from typing import Dict
 
-from env import URL
 
-
-def extract_data(data: Dict) -> Dict:
+def extract_data(data: Dict, url: str) -> Dict:
     top = 100 * data["ranking"] / data["ranking_tot"]
     top = '{0:.2f}'.format(top)
     return {
-        'url': URL,
+        'url': url,
         'name': data['pseudo'],
         'avatar_url': data['avatar_url'],
         'score': data['score'],
