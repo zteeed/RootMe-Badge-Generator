@@ -5,6 +5,7 @@ from multiprocessing import Process
 
 from dotenv import load_dotenv
 from flask import Flask, flash, render_template, request, send_from_directory
+from flask_cors import CORS, cross_origin
 from timeloop import Timeloop
 
 from config import Config
@@ -16,6 +17,7 @@ load_dotenv()
 tl = Timeloop()
 app = Flask(__name__)
 app.config.from_object(Config)
+CORS(app)
 
 URL = os.environ.get('URL')
 
@@ -63,6 +65,7 @@ def index():
 
 
 @app.route('/storage_server/<string:filename>')
+@cross_origin(origin='*')
 def serve_files(filename):
     return send_from_directory(f'storage_server', filename)
 
