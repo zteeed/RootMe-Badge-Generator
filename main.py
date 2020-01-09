@@ -72,6 +72,8 @@ def serve_files(filename):
 
 @app.route('/storage_clients/<string:folder>/<string:filename>')
 def serve_files_clients(folder, filename):
+    if filename == 'badge.js':
+        return send_from_directory(f'storage_clients/{folder}', filename, mimetype='text/javascript')
     return send_from_directory(f'storage_clients/{folder}', filename)
 
 
