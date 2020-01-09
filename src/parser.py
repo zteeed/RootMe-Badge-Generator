@@ -28,12 +28,17 @@ def extract_info_username_input(username: str, api: RMAPI) \
             return None, None, f'{username} is not a valid RootMe username.', 'error'
         data = json.loads(content)[0]
         if len(data) > 1:  # several accounts with same username
+            users = []
+            for key in data:
+                users.append({
+                    'username_select': f'{data[key]["nom"]}-{data[key]["id_auteur"]}',
+                    'score': int(api.get_score_existing_user(data[key]['id_auteur']))
+                })
+            users = sorted(users, key=lambda x: x['score'], reverse=True)
             message = '<div style="text-align: left">'
             message += 'Several users exists from this username.<br>Please choose between these:<br><ul>'
-            for key in data:
-                username_select = f'{data[key]["nom"]}-{data[key]["id_auteur"]}'
-                score = api.get_score_existing_user(data[key]['id_auteur'])
-                message += f'<li>{username_select} (Score = {score} point(s))</li>'
+            for user in users:
+                message += f'<li>{user["username_select"]} (Score = {user["score"]} point(s))</li>'
             message += '</ul></div>'
             return None, None, f'{message}', 'info'
         data = data['0']
