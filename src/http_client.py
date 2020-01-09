@@ -110,18 +110,23 @@ class RMAPI:
         return http_get_url(self.session, url)
 
     def get_user_info(self, username: str):
+        result = {}
         for lang in ['fr', 'en', 'de', 'es']:
             url = f'{self.api_url}/auteurs?nom={username}&lang={lang}'
             content = self.http_get(url)
-            if content is not None:
-                return content
+            if content is None:
+                continue
+            data = json.loads(content)[0]
+            length = len(result)
+            for key in data:
+                result[str(length + int(key))] = data[key]
+        if result == {}:
+            return None
+        return json.dumps([result])
 
     def get_user_data(self, id_user: int):
-        for lang in ['fr', 'en', 'de', 'es']:
-            url = f'{self.api_url}/auteurs/{id_user}&lang={lang}'
-            content = self.http_get(url)
-            if content is not None:
-                return content
+        url = f'{self.api_url}/auteurs/{id_user}'
+        return self.http_get(url)
 
     def get_score_existing_user(self, id_user: int):
         content = self.get_user_data(id_user)
