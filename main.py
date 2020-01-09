@@ -1,7 +1,6 @@
 import json
 import os
 from datetime import timedelta
-from multiprocessing import Process
 
 from dotenv import load_dotenv
 from flask import Flask, flash, render_template, request, send_from_directory
@@ -17,6 +16,8 @@ load_dotenv()
 tl = Timeloop()
 app = Flask(__name__)
 app.config.from_object(Config)
+api = RMAPI()
+app.api = api
 CORS(app)
 
 URL = os.environ.get('URL')
@@ -36,26 +37,26 @@ def index():
         flash('Username is empty', 'error')
         return render_template('index.html')
 
-    username, id_auteur, flash_message, flash_type = extract_info_username_input(username, api)
+    username, id_auteur, flash_message, flash_type = extract_info_username_input(username, app.api)
     if flash_message is not None and flash_type is not None:  # username input is not related to a real RootMe account
         flash(f'{flash_message}', flash_type)
         return render_template('index.html')
 
-    url = f'{api.api_url}/auteurs/{id_auteur}'
-    content = api.http_get(url)
+    url = f'{app.api.api_url}/auteurs/{id_auteur}'
+    content = app.api.http_get(url)
     if content is None:  # account exists but has a score equal to zero
         data = {
             'nom': username,
-            'position': api.number_users,
+            'position': app.api.number_users,
             'score': 0,
             'validations': []
         }
     else:
         data = json.loads(content)
-    data = extract_data(data, id_auteur, api, URL)
+    data = extract_data(data, id_auteur, app.api, URL)
 
     # store static png badges
-    save_paths, folder_path, avatar_path = make_storage(api, data)
+    save_paths, folder_path, avatar_path = make_storage(app.api, data)
     # update avatar_url with local url
     data['avatar_url'] = f'{URL}/{avatar_path}'
     # store dynamic js badge as js script
@@ -79,12 +80,12 @@ def serve_files_clients(folder, filename):
 
 @tl.job(interval=timedelta(days=1))
 def update_number_rootme_challenges() -> None:
-    api.update_number_rootme_challenges()
+    app.api.update_number_rootme_challenges()
 
 
 @tl.job(interval=timedelta(days=1))
 def update_number_rootme_users() -> None:
-    api.update_number_rootme_challenges()
+    app.api.update_number_rootme_challenges()
 
 
 def start_tl():
@@ -92,8 +93,4 @@ def start_tl():
 
 
 if __name__ == '__main__':
-    api = RMAPI()
-    p = Process(target=start_tl)
-    p.start()
     app.run(host='0.0.0.0', port=80)
-    p.join()
