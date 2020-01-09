@@ -1,19 +1,16 @@
 import json
-
 import os
-import re
-from flask import Flask, flash, render_template, request, send_from_directory
-
-from config import Config
-from dotenv import load_dotenv
 from datetime import timedelta
-from timeloop import Timeloop
 from multiprocessing import Process
 
-from src.http_client import RMAPI
-from src.parser import extract_data
-from src.storage import make_storage, make_storage_js
+from dotenv import load_dotenv
+from flask import Flask, flash, render_template, request, send_from_directory
+from timeloop import Timeloop
 
+from config import Config
+from src.http_client import RMAPI
+from src.parser import extract_data, extract_info_username_input
+from src.storage import make_storage, make_storage_js
 
 load_dotenv()
 tl = Timeloop()
@@ -37,46 +34,14 @@ def index():
         flash('Username is empty', 'error')
         return render_template('index.html')
 
-    # Check if id_auteur is in username
-    result_id_auteur = re.findall(r'-(\d+)$', username)
-    if result_id_auteur:
-        id_auteur = int(result_id_auteur[0])
-        content = api.get_user_data(id_auteur)
-        real_username = '-'.join(username.split('-')[:-1])
-        if content is not None and json.loads(content)['nom'] != real_username:  # content might be None is score = 0
-            flash(f'{username} is not a valid RootMe username.', 'error')
-            return render_template('index.html')
-        content = api.get_user_info(real_username)
-        if content is None:
-            flash(f'{username} is not a valid RootMe username.', 'error')
-            return render_template('index.html')
-        data = json.loads(content)[0]
-        if id_auteur not in [int(data[key]['id_auteur']) for key in data]:
-            flash(f'{username} is not a valid RootMe username.', 'error')
-            return render_template('index.html')
-        username = real_username
-    else:
-        content = api.get_user_info(username)
-        if content is None:
-            flash(f'{username} is not a valid RootMe username.', 'error')
-            return render_template('index.html')
-        data = json.loads(content)[0]
-        if len(data) > 1:  # several accounts with same username
-            message = '<div style="text-align: left">'
-            message += 'Several users exists from this username.<br>Please choose between these:<br><ul>'
-            for key in data:
-                username_select = f'{data[key]["nom"]}-{data[key]["id_auteur"]}'
-                score = api.get_score_existing_user(data[key]['id_auteur'])
-                message += f'<li>{username_select} (Score = {score} point(s))</li>'
-            message += '</ul></div>'
-            flash(message, 'info')
-            return render_template('index.html')
-        data = data['0']
-        id_auteur = data['id_auteur']
+    username, id_auteur, flash_message, flash_type = extract_info_username_input(username, api)
+    if flash_message is not None and flash_type is not None:  # username input is not related to a real RootMe account
+        flash(f'{flash_message}', flash_type)
+        return render_template('index.html')
 
     url = f'{api.api_url}/auteurs/{id_auteur}'
     content = api.http_get(url)
-    if content is None:
+    if content is None:  # account exists but has a score equal to zero
         data = {
             'nom': username,
             'position': api.number_users,
