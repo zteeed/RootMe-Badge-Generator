@@ -5,7 +5,7 @@
 **Root-Me Badge Generator** is a web application script that generates badges from Root-me profiles.
 
 The original idea came from *Podalirius* on the Root-Me forums (https://www.root-me.org/?page=forum&id_thread=12859) \
-I forked [this project](https://github.com/HexPandaa/RootMe-Badge-Generator) in order to use his static png badge generator. I changed the way to fetch data from [Root-Me website](https://www.root-me.org/) using my custom API (see [https://github.com/zteeed/Root-Me-API](https://github.com/zteeed/Root-Me-API)). \
+I forked [this project](https://github.com/HexPandaa/RootMe-Badge-Generator) in order to use his static png badge generator. I changed the way to fetch data from [Root-Me website](https://www.root-me.org/) using the official API (see [https://api.www.root-me.org/](https://api.www.root-me.org/)). \
 Then, i built the web application and added a HackTheBox theme in order to add it next to my HackTheBox badge on [my website](https://duboc.xyz/about)
 
 ## Configuration
