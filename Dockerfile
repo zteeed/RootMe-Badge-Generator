@@ -1,8 +1,9 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.7
 
-COPY ./ /app
+COPY ./requirements.txt /app/requirements.txt
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+COPY ./ /app
 
 VOLUME /app/storage_clients
 
