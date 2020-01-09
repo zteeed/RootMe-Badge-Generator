@@ -10,14 +10,20 @@ Then, i built the web application and added a HackTheBox theme in order to add i
 
 ## Configuration
 
-Edit `SECRET_KEY` with a random string in [env.py](env.py). \
+- [dev] edit `.env` file 
+- [prod] edit `ENV` attributes inside the `Dockerfile`.
+
 Example:
 ```
-SECRET_KEY=73498f3139b57a2543ba3a368dadb6ac
-API_URL=https://root-me-api.hackademint.org
-URL=https://root-me-badge.hackademint.org
-STORAGE_FOLDER=storage_clients
+ENV API_URL https://api.www.root-me.org
+ENV URL https://root-me-badge.hackademint.org
+ENV STORAGE_FOLDER storage_clients
+ENV ROOTME_ACCOUNT_USERNAME rootme_username
+ENV ROOTME_ACCOUNT_PASSWORD password 
 ```
+
+`ROOTME_ACCOUNT_USERNAME` and `ROOTME_ACCOUNT_PASSWORD` stands for the credentials for a valid RootMe account. \
+`URL` is the external URI where the application can be reached.
 
 ## Install 
 
