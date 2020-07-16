@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import sys
 from typing import Optional
 
 import requests
@@ -8,6 +9,30 @@ from requests import Session
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 from lxml import html
+
+
+class ExFormatter(logging.Formatter):
+    def_keys = ['name', 'msg', 'args', 'levelname', 'levelno',
+            'pathname', 'filename', 'module', 'exc_info',
+            'exc_text', 'stack_info', 'lineno', 'funcName',
+            'created', 'msecs', 'relativeCreated', 'thread',
+            'threadName', 'processName', 'process', 'message']
+    def format(self, record):
+        string = super().format(record)
+        extra = {k: v for k,v in record.__dict__.items()
+             if k not in self.def_keys}
+        if len(extra)>0:
+            string += " - extra: " + str(extra)
+        return string
+
+
+logging.basicConfig()
+#  logging.root.setLevel(logging.NOTSET)
+log = logging.getLogger('app')
+log.setLevel(logging.INFO)
+logger = logging.StreamHandler(sys.stdout)
+logger.setFormatter(ExFormatter())
+log.addHandler(logger)
 
 
 class HTTPBadStatusCodeError(RuntimeError):
@@ -28,14 +53,15 @@ def http_get_url(session: Session, url: str) -> Optional[bytes]:
     :param url: url to the page
     :return: HTML of the page or None
     """
+    log.log(logging.INFO, f'http_get', extra=dict(url=url))
     r = session.get(url)
 
     if r.status_code == 200:
-        logging.debug(f'http_get_success', status_code=r.status_code, url=url)
+        log.log(logging.INFO, f'http_get_success', extra=dict(url=url, status_code=r.status_code))
         return r.content
 
     if r.status_code == 404:
-        logging.info(f'http_get_error', status_code=r.status_code, url=url)
+        log.log(logging.INFO, f'http_get_error', extra=dict(url=url, status_code=r.status_code))
         return None
 
     raise HTTPBadStatusCodeError(r.status_code)
@@ -69,13 +95,15 @@ class RMAPI:
             "login": username,
             "password": password,
         }
-        r = self.session.post(f'{self.api_url}/login', data=payload)
+        url = f'{self.api_url}/login'
+        log.log(logging.INFO, f'http_get', extra=dict(url=url))
+        r = self.session.post(url, data=payload)
 
         if r.status_code != 200:
-            logging.debug(f'Authentication failed', status_code=r.status_code, url=self.api_url, payload=payload)
+            log.log(logging.INFO, f'Authentication failed', extra=dict(url=self.api_url, status_code=r.status_code, payload=payload))
             raise HTTPBadStatusCodeError(r.status_code)
 
-        logging.debug(f'Authentication successful', status_code=r.status_code, url=self.api_url)
+        log.log(logging.INFO, f'Authentication successful', extra=dict(url=self.api_url, status_code=r.status_code))
         response = json.loads(r.content)[0]
         # Note that domain keyword parameter is the only optional parameter here
         cookie_obj = requests.cookies.create_cookie(
@@ -84,25 +112,33 @@ class RMAPI:
             value=str(response["info"]["spip_session"])
         )
         self.session.cookies.set_cookie(cookie_obj)
-        logging.debug(f'New cookie added for RM API', cookie_obj=cookie_obj)
+        log.log(logging.INFO, f'New cookie added for RM API', extra=dict(cookie_obj=cookie_obj))
 
     def update_number_rootme_challenges(self) -> None:
-        r = self.session.get(f'{self.api_url}/challenges')
+        url = f'{self.api_url}/challenges'
+        log.log(logging.INFO, f'http_get', extra=dict(url=url))
+        r = self.session.get(url)
         data = json.loads(r.content)
         count = 0
         while data[-1]['rel'] != 'previous':
             count += 50
-            r = self.session.get(f'{self.api_url}/challenges?debut_challenges={count}')
+            url = f'{self.api_url}/challenges?debut_challenges={count}'
+            log.log(logging.INFO, f'http_get', extra=dict(url=url))
+            r = self.session.get(url)
             data = json.loads(r.content)
         self.number_challenges = count + len(data[0])
 
     def update_number_rootme_users(self) -> None:
-        r = self.session.get(f'{self.api_url}/auteurs')
+        url = f'{self.api_url}/auteurs'
+        log.log(logging.INFO, f'http_get', extra=dict(url=url))
+        r = self.session.get(url)
         data = json.loads(r.content)
-        count = 2860 * 50  # offset
+        count = 3000 * 50  # offset
         while data[-1]['rel'] != 'previous':
             count += 50
-            r = self.session.get(f'{self.api_url}/auteurs?debut_auteurs={count}')
+            url = f'{self.api_url}/auteurs?debut_auteurs={count}'
+            log.log(logging.INFO, f'http_get', extra=dict(url=url))
+            r = self.session.get(url)
             data = json.loads(r.content)
         self.number_users = count + len(data[0])
 
