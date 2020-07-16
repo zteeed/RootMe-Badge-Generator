@@ -128,19 +128,28 @@ class RMAPI:
             data = json.loads(r.content)
         self.number_challenges = count + len(data[0])
 
-    def update_number_rootme_users(self) -> None:
-        url = f'{self.api_url}/auteurs'
-        log.log(logging.INFO, f'http_get', extra=dict(url=url))
+    def update_number_rootme_users(self, mini=0, maxi=10**6) -> None:
+        count = (mini + maxi) // 2
+        count += 1
+
+        url = f'{self.api_url}/auteurs?debut_auteurs={count}'
+        log.log(logging.INFO, f'http_get', extra=dict(url=url, count=count, mini=mini, maxi=maxi))
         r = self.session.get(url)
         data = json.loads(r.content)
-        count = 3000 * 50  # offset
-        while data[-1]['rel'] != 'previous':
-            count += 50
-            url = f'{self.api_url}/auteurs?debut_auteurs={count}'
-            log.log(logging.INFO, f'http_get', extra=dict(url=url))
-            r = self.session.get(url)
-            data = json.loads(r.content)
-        self.number_users = count + len(data[0])
+
+        url = f'{self.api_url}/auteurs?debut_auteurs={count - 1}'
+        log.log(logging.INFO, f'http_get', extra=dict(url=url, count=count - 1, mini=mini, maxi=maxi))
+        r = self.session.get(url)
+        data_previous = json.loads(r.content)
+
+        if abs(len(data_previous[0]) - len(data[0])) == 1:
+            self.number_users = count + len(data[0])
+            return
+
+        if data[-1]['rel'] == 'previous':
+            self.update_number_rootme_users(mini=mini, maxi=count + 1)
+        else:
+            self.update_number_rootme_users(mini=count - 1, maxi=maxi)
 
     def http_get(self, url):
         return http_get_url(self.session, url)
