@@ -103,14 +103,14 @@ class RMAPI:
             "password": password,
         }
         url = f'{self.api_url}/login'
-        log.log(logging.INFO, f'http_get', extra=dict(url=url))
+        log.log(logging.INFO, f'http_post', extra=dict(url=url, payload=payload))
         r = self.session.post(url, data=payload)
 
         if r.status_code != 200:
-            log.log(logging.INFO, f'Authentication failed', extra=dict(url=self.api_url, status_code=r.status_code, payload=payload))
+            log.log(logging.INFO, f'Authentication failed', extra=dict(url=url, status_code=r.status_code, payload=payload))
             raise HTTPBadStatusCodeError(r.status_code)
 
-        log.log(logging.INFO, f'Authentication successful', extra=dict(url=self.api_url, status_code=r.status_code))
+        log.log(logging.INFO, f'Authentication successful', extra=dict(url=url, status_code=r.status_code))
         response = json.loads(r.content)[0]
         # Note that domain keyword parameter is the only optional parameter here
         cookie_obj = requests.cookies.create_cookie(
