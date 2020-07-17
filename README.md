@@ -28,8 +28,8 @@ ENV ROOTME_ACCOUNT_PASSWORD password
 ## Install 
 
 ```
-docker build -t badge_generator .
-docker run -d -p 5000:80 --name badge_generator badge_generator
+docker build -t zteeed/badge_generator .
+docker run -d --restart always -p 5000:80 --name badge_generator zteeed/badge_generator
 ```
 
 ## Result
