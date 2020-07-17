@@ -191,22 +191,39 @@ class RMAPI:
         data = json.loads(content)
         return int(data['score'])
 
-    def get_avatar_url(self, username: str, id_user: int) -> str:
+    def get_profile_page_url(self, username: str, id_user: int, score: int) -> Optional[str]:
         url = f'{self.api_url}/{username}-{id_user}'
         content = self.http_get(url)
-        if content is None:
-            url = f'{self.api_url}/{username}'
-            content = self.http_get(url)
+        if content is not None:
+            return url
+
+        url = f'{self.api_url}/{username}'
+        content = self.http_get(url)
+        if content is not None:
+            return url
+
+        url = f'{self.api_url}/?page=recherche&recherche={username}'
+        content = self.http_get(url)
+        tree = html.fromstring(content)
+        user_profile_urls = tree.xpath(f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, {username})]/@href')
+        for url_path in user_profile_urls:
+            #  check every pages to check if profile page match score
+            pass
+        if len(user_profile_urls) == 1:
+            url = self.api_url + user_profile_urls[0]
+            return url
+        else:
+            raise Exception('Update method to find profile page url')
+
+
+    def get_avatar_url(self, profile_page_url: str) -> str:
+        content = self.http_get(profile_page_url)
         tree = html.fromstring(content)
         result = tree.xpath('//h1/img[@itemprop="image"]/@src')
         return f'{self.api_url}/{result[0]}'
 
-    def get_rank(self, username: str, id_user: int) -> str:
-        url = f'{self.api_url}/{username}-{id_user}?inc=score'
-        content = self.http_get(url)
-        if content is None:
-            url = f'{self.api_url}/{username}?inc=score'
-            content = self.http_get(url)
+    def get_rank(self, profile_page_url: str) -> str:
+        content = self.http_get(profile_page_url)
         tree = html.fromstring(content)
         div_result = tree.xpath('//div[@class="row text-center"]/div[@class="small-12 medium-4 columns"]')
         if not div_result:
