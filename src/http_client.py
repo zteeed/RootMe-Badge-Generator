@@ -7,6 +7,7 @@ from typing import Optional, Tuple
 import requests
 from requests import Session
 from requests.adapters import HTTPAdapter
+from random_user_agent.user_agent import UserAgent
 from urllib3 import Retry
 from lxml import html
 
@@ -88,6 +89,8 @@ class RMAPI:
         session.mount('http://', adapter)
         session.mount('https://', adapter)
         self.session = session
+        user_agent_rotator = UserAgent()
+        self.session.user_agent = user_agent_rotator.get_random_user_agent()
         self.account_username = os.environ.get('ROOTME_ACCOUNT_USERNAME')
         self.account_password = os.environ.get('ROOTME_ACCOUNT_PASSWORD')
         self.authenticate(self.account_username, self.account_password)
