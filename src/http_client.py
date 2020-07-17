@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import sys
-from typing import Optional
+from typing import Optional, Tuple
 
 import requests
 from requests import Session
@@ -43,7 +43,7 @@ class HTTPBadStatusCodeError(RuntimeError):
 session = Session()
 
 
-def http_get_url(session: Session, url: str) -> Optional[bytes]:
+def http_get_url(session: Session, url: str) -> Tuple[Optional[bytes], int]:
     """
     Retrieves the HTML from a page via HTTP(s).
     If the page is present on the server (200 status code), returns the html.
@@ -58,11 +58,15 @@ def http_get_url(session: Session, url: str) -> Optional[bytes]:
 
     if r.status_code == 200:
         log.log(logging.INFO, f'http_get_success', extra=dict(url=url, status_code=r.status_code))
-        return r.content
+        return r.content, r.status_code
 
     if r.status_code == 404:
         log.log(logging.INFO, f'http_get_error', extra=dict(url=url, status_code=r.status_code))
-        return None
+        return None, r.status_code
+
+    if r.status_code == 401:
+        log.log(logging.INFO, f'http_get_error', extra=dict(url=url, status_code=r.status_code))
+        return None, r.status_code
 
     raise HTTPBadStatusCodeError(r.status_code)
 
@@ -84,9 +88,9 @@ class RMAPI:
         session.mount('http://', adapter)
         session.mount('https://', adapter)
         self.session = session
-        account_username = os.environ.get('ROOTME_ACCOUNT_USERNAME')
-        account_password = os.environ.get('ROOTME_ACCOUNT_PASSWORD')
-        self.authenticate(account_username, account_password)
+        self.account_username = os.environ.get('ROOTME_ACCOUNT_USERNAME')
+        self.account_password = os.environ.get('ROOTME_ACCOUNT_PASSWORD')
+        self.authenticate(self.account_username, self.account_password)
         self.update_number_rootme_challenges()
         self.update_number_rootme_users()
 
@@ -152,7 +156,11 @@ class RMAPI:
             self.update_number_rootme_users(mini=count - 1, maxi=maxi)
 
     def http_get(self, url):
-        return http_get_url(self.session, url)
+        content, status_code = http_get_url(self.session, url)
+        if status_code == 401:
+            self.authenticate(self.account_username, self.account_password)
+        content, status_code = http_get_url(self.session, url)
+        return content 
 
     def get_user_info(self, username: str):
         result = {}
