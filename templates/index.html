@@ -28,7 +28,7 @@
                         </form>
                     </div>
                     <div class="col-12" style="text-align: center; margin-top: 10px;">
-                        <a href='javascript:document.getElementById("myForm").submit();' class="button large scrolly">
+                        <a href='javascript:generate();' class="button large scrolly">
                             <i style="padding-right: 15px" class="fa fa-cogs" aria-hidden="true"></i>
                             Generate
                         </a>
@@ -38,4 +38,10 @@
         </div>
     </div>
 </article>
+<script>
+function generate() {
+	display_sw2("Please wait...", "Generating RootMe Badge", "info");
+	document.getElementById("myForm").submit();
+}
+</script>
 {% endblock %}
