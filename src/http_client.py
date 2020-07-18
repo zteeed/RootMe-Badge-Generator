@@ -153,6 +153,10 @@ class RMAPI:
             self.number_users = count + len(data[0])
             return
 
+        if abs(maxi - mini) < 5:
+            self.number_users = count + len(data[0])
+            return
+
         if data[-1]['rel'] == 'previous':
             self.update_number_rootme_users(mini=mini, maxi=count + 1)
         else:
