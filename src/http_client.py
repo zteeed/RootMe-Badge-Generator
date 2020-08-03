@@ -227,10 +227,10 @@ class RMAPI:
         return f'{self.api_url}/{result[0]}'
 
     def get_rank(self, profile_page_url: str) -> str:
-        content = self.http_get(profile_page_url)
+        content = self.http_get(profile_page_url + '?inc=score')
         tree = html.fromstring(content)
-        div_result = tree.xpath('//div[@class="row text-center"]/div[@class="small-12 medium-4 columns"]')
-        if not div_result:
+        result = tree.xpath('//div[@class="t-body tb-padding"]/div/div[@class="row text-center"]/div/span/text()')
+        result = [item.strip() for item in result if item.strip()]
+        if not result:
             return 'newbie'
-        return div_result[-1].xpath('span[@class="color1 txxl"]/text()')[0].strip()
-
+        return result[-1]
