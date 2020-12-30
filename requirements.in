@@ -4,6 +4,5 @@ lxml
 pillow
 python-dotenv
 python-magic
-random_user_agent
 requests
 timeloop

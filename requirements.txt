@@ -17,7 +17,6 @@ markupsafe==1.1.1         # via jinja2
 pillow==6.2.1             # via -r requirements.in
 python-dotenv==0.10.3     # via -r requirements.in
 python-magic==0.4.15      # via -r requirements.in
-random-user-agent==1.0.1  # via -r requirements.in
 requests==2.22.0          # via -r requirements.in
 six==1.13.0               # via flask-cors
 timeloop==1.0.2           # via -r requirements.in
