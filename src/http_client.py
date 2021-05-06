@@ -13,15 +13,16 @@ from lxml import html
 
 class ExFormatter(logging.Formatter):
     def_keys = ['name', 'msg', 'args', 'levelname', 'levelno',
-            'pathname', 'filename', 'module', 'exc_info',
-            'exc_text', 'stack_info', 'lineno', 'funcName',
-            'created', 'msecs', 'relativeCreated', 'thread',
-            'threadName', 'processName', 'process', 'message']
+                'pathname', 'filename', 'module', 'exc_info',
+                'exc_text', 'stack_info', 'lineno', 'funcName',
+                'created', 'msecs', 'relativeCreated', 'thread',
+                'threadName', 'processName', 'process', 'message']
+
     def format(self, record):
         string = super().format(record)
-        extra = {k: v for k,v in record.__dict__.items()
-             if k not in self.def_keys}
-        if len(extra)>0:
+        extra = {k: v for k, v in record.__dict__.items()
+                 if k not in self.def_keys}
+        if len(extra) > 0:
             string += " - extra: " + str(extra)
         return string
 
@@ -107,7 +108,8 @@ class RMAPI:
         r = self.session.post(url, data=payload)
 
         if r.status_code != 200:
-            log.log(logging.INFO, f'Authentication failed', extra=dict(url=url, status_code=r.status_code, payload=payload))
+            log.log(logging.INFO, f'Authentication failed',
+                    extra=dict(url=url, status_code=r.status_code, payload=payload))
             raise HTTPBadStatusCodeError(r.status_code)
 
         log.log(logging.INFO, f'Authentication successful', extra=dict(url=url, status_code=r.status_code))
@@ -135,7 +137,7 @@ class RMAPI:
             data = json.loads(r.content)
         self.number_challenges = count + len(data[0])
 
-    def update_number_rootme_users(self, mini=0, maxi=10**6) -> None:
+    def update_number_rootme_users(self, mini=0, maxi=10 ** 6) -> None:
         count = (mini + maxi) // 2
         count += 1
 
@@ -167,7 +169,7 @@ class RMAPI:
         if status_code == 401:
             self.authenticate(self.account_username, self.account_password)
         content, status_code = http_get_url(self.session, url)
-        return content 
+        return content
 
     def get_user_info(self, username: str):
         result = {}
@@ -218,7 +220,6 @@ class RMAPI:
             return url
         else:
             raise Exception('Update method to find profile page url')
-
 
     def get_avatar_url(self, profile_page_url: str) -> str:
         content = self.http_get(profile_page_url)
