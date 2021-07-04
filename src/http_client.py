@@ -203,6 +203,9 @@ class RMAPI:
         if content is not None:
             return url
 
+        if ' ' in username:
+            username = username.replace(' ', '-')
+
         url = f'{self.api_url}/{username}'
         content = self.http_get(url)
         if content is not None:
@@ -211,15 +214,14 @@ class RMAPI:
         url = f'{self.api_url}/?page=recherche&recherche={username}'
         content = self.http_get(url)
         tree = html.fromstring(content)
-        user_profile_urls = tree.xpath(f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, {username})]/@href')
+        user_profile_urls = tree.xpath(f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, "{username}")]/@href')
         for url_path in user_profile_urls:
             #  check every pages to check if profile page match score
             pass
         if len(user_profile_urls) == 1:
             url = self.api_url + user_profile_urls[0]
             return url
-        else:
-            raise Exception('Update method to find profile page url')
+        raise Exception('Update method to find profile page url')
 
     def get_avatar_url(self, profile_page_url: str) -> str:
         content = self.http_get(profile_page_url)
