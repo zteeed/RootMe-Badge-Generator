@@ -1,13 +1,14 @@
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: rootme
 ---
+# apiVersion: v1
+# kind: Namespace
+# metadata:
+#   name: rootme
+# ---
 apiVersion: v1
 kind: Service
 metadata:
   name: rootme-service 
-  namespace: rootme
+  # namespace: rootme
 spec:
   selector:
     app: rootme 
@@ -23,7 +24,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: rootme 
-  namespace: rootme
+  # namespace: rootme
 spec:
   selector:
     matchLabels:
