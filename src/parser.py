@@ -47,7 +47,7 @@ def extract_info_username_input(username: str, api: RMAPI) \
 
 
 def extract_data(data: Dict, id_auteur: int, api: RMAPI, url: str) -> Dict:
-    top = 100 * data['position'] / api.number_users
+    top = max(0.01, 100 * data['position'] / api.number_users)
     top = '{0:.2f}'.format(top)
     score = data['score']
     username = data['nom']
