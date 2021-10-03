@@ -117,7 +117,7 @@ class Badge:
         total = int(self.total_users)
         text = f"{ranking}/{total}"
         if ranking != 0 and total != 0:
-            text += f" (Top {ranking / total * 100:.2f}%)"
+            text += f" (Top {max(0.01, ranking / total * 100):.2f}%)"
         d.text(
             xy=offset,
             text=text,
