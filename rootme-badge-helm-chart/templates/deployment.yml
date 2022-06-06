@@ -22,7 +22,7 @@ spec:
   selector:
     matchLabels:
       app: rootme 
-  replicas: 4
+  replicas: 1
   template:
     metadata:
       labels:
@@ -32,6 +32,11 @@ spec:
       - name: rootme
         image: {{ .Values.image }}
         imagePullPolicy: IfNotPresent
+        env:
+          - name: ROOTME_ACCOUNT_USERNAME
+            value: {{ .Values.rootme_username }}
+          - name: ROOTME_ACCOUNT_PASSWORD
+            value: {{ .Values.rootme_password }}
         ports:
         - containerPort: 80
         volumeMounts:
