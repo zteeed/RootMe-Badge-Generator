@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+    - name: Set output
+      id: vars
+      run: echo ::set-output name=tag::$(date +%Y-%m-%d-%H-%M-%S)
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     - name: Login to DockerHub
@@ -22,4 +25,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: zteeed/rootme-badge-generator:$(date +%Y-%m-%d-%H-%M-%S)
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:${{ steps.vars.outputs.tag }}
+
+
+
