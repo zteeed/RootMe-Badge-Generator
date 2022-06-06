@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  IMAGE_VERSION: $(date +%Y-%m-%d-%H-%M-%S)
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -25,7 +28,7 @@ jobs:
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:${{ steps.vars.outputs.tag }}
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:${{ env.IMAGE_VERSION }}
 
 
 
