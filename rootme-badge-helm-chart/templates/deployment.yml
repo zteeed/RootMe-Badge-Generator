@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: rootme
-        image: localhost:5000/rootme:{{ .Values.imageVersion }}
+        image: {{ .Values.image }}
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 80
