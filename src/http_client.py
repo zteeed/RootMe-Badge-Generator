@@ -232,7 +232,7 @@ class RMAPI:
     def get_rank(self, profile_page_url: str) -> str:
         content = self.http_get(profile_page_url)
         tree = html.fromstring(content)
-        result = tree.xpath('//tr[@style="border: 1px #2ba6cb solid"]/td[@class="show-for-large-up"]')[-1].text
+        result = tree.xpath('//img[starts-with(@src, "squelettes/img/rang")]/../../../tr[@style="border: 1px #2ba6cb solid"]/td/img/@title')[0]
         if not result:
             return 'newbie'
         return result.strip()
