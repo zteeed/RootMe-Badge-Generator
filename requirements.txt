@@ -28,7 +28,7 @@ markupsafe==1.1.1
     # via jinja2
 pillow==9.1.1
     # via -r requirements.in
-python-dotenv==0.10.3
+python-dotenv==0.20.0
     # via -r requirements.in
 python-magic==0.4.26
     # via -r requirements.in
