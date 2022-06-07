@@ -22,7 +22,7 @@ itsdangerous==1.1.0
     # via flask
 jinja2==2.10.3
     # via flask
-lxml==4.4.2
+lxml==4.9.0
     # via -r requirements.in
 markupsafe==1.1.1
     # via jinja2
