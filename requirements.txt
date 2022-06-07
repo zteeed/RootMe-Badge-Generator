@@ -4,21 +4,41 @@
 #
 #    pip-compile
 #
-certifi==2019.9.11        # via requests
-chardet==3.0.4            # via requests
-click==7.0                # via flask
-flask-cors==3.0.8         # via -r requirements.in
-flask==1.1.1              # via -r requirements.in, flask-cors
-idna==2.8                 # via requests
-itsdangerous==1.1.0       # via flask
-jinja2==2.10.3            # via flask
-lxml==4.4.2               # via -r requirements.in
-markupsafe==1.1.1         # via jinja2
-pillow==6.2.1             # via -r requirements.in
-python-dotenv==0.10.3     # via -r requirements.in
-python-magic==0.4.15      # via -r requirements.in
-requests==2.22.0          # via -r requirements.in
-six==1.13.0               # via flask-cors
-timeloop==1.0.2           # via -r requirements.in
-urllib3==1.25.6           # via requests
-werkzeug==0.16.0          # via flask
+certifi==2019.9.11
+    # via requests
+chardet==3.0.4
+    # via requests
+click==7.0
+    # via flask
+flask==1.1.1
+    # via
+    #   -r requirements.in
+    #   flask-cors
+flask-cors==3.0.8
+    # via -r requirements.in
+idna==2.8
+    # via requests
+itsdangerous==1.1.0
+    # via flask
+jinja2==2.10.3
+    # via flask
+lxml==4.4.2
+    # via -r requirements.in
+markupsafe==1.1.1
+    # via jinja2
+pillow==9.0.1
+    # via -r requirements.in
+python-dotenv==0.10.3
+    # via -r requirements.in
+python-magic==0.4.15
+    # via -r requirements.in
+requests==2.22.0
+    # via -r requirements.in
+six==1.13.0
+    # via flask-cors
+timeloop==1.0.2
+    # via -r requirements.in
+urllib3==1.25.6
+    # via requests
+werkzeug==0.16.0
+    # via flask
