@@ -25,17 +25,23 @@ jobs:
       with:
         push: true
         tags: ${{ env.IMAGE_VERSION }}
+    - name: Set artifact
+      run: echo ${{ env.IMAGE_VERSION }} > version.txt
+    - uses: actions/upload-artifact@v2
+      with:
+        name: image-version
+        path: version.txt
   deploy:
     needs: build
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v2
+        with:
+          name: image-version
       - name: Compute image version
         run: >
-          export IMAGE_VERSION=$(
-            curl -s https://registry.hub.docker.com/v1/repositories/${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator/tags \
-            | jq -r '.[-1].name'
-          ) && echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
+          echo "IMAGE_VERSION=$(cat version.txt)" >> $GITHUB_ENV
       - name: Compute values.yaml
         run: |
           cat > /tmp/values-$IMAGE_VERSION.yaml << EOF
