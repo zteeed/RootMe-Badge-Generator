@@ -5,6 +5,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 from flask import Flask, flash, render_template, request, send_from_directory
 from flask_cors import CORS, cross_origin
+from werkzeug.utils import secure_filename
 from timeloop import Timeloop
 
 from config import Config
@@ -68,11 +69,14 @@ def index():
 @app.route('/storage_server/<string:filename>')
 @cross_origin(origin='*')
 def serve_files(filename):
+    filename = secure_filename(filename)
     return send_from_directory(f'storage_server', filename)
 
 
 @app.route('/storage_clients/<string:folder>/<string:filename>')
 def serve_files_clients(folder, filename):
+    folder = secure_filename(folder)
+    filename = secure_filename(filename)
     if filename == 'badge.js':
         return send_from_directory(f'storage_clients/{folder}', filename, mimetype='text/javascript')
     return send_from_directory(f'storage_clients/{folder}', filename)
