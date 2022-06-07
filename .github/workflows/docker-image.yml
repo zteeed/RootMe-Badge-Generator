@@ -20,6 +20,9 @@ jobs:
         if [[ $(echo ${{ steps.changed-files.outputs.all_changed_files }}) == "requirements.txt" ]]; then
           exit 1 # dependabot
         fi
+        if [[ $(echo ${{ steps.changed-files.outputs.all_changed_files }}) == "" ]]; then
+          exit 1 # no changes
+        fi
     - name: Set output
       run: echo "IMAGE_VERSION=${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
     - name: Set up Docker Buildx
