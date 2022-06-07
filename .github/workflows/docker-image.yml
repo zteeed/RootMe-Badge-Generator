@@ -1,10 +1,10 @@
-name: Docker Image CI
+name: Build & Deploy
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 #env:
 #  IMAGE_VERSION: $(date +%Y-%m-%d-%H-%M-%S)
@@ -30,6 +30,7 @@ jobs:
     #    push: true
     #    tags: ${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:${{ steps.vars.outputs.tag }}
   deploy:
+    needs: [build]
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
@@ -40,7 +41,7 @@ jobs:
       - name: Compute image version
         run: >
           export IMAGE_VERSION=$(
-            curl -s https://registry.hub.docker.com/v1/repositories/${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator/tags
+            curl -s https://registry.hub.docker.com/v1/repositories/${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator/tags \
             | jq -r '.[-1].name'
           )
         shell: bash
