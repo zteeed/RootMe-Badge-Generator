@@ -34,10 +34,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - name: Compute stuff
-        run: >
-          pwd && ls -la
-        shell: bash
       - name: Compute image version
         run: >
           export IMAGE_VERSION=$(
@@ -46,7 +42,7 @@ jobs:
           )
         shell: bash
       - name: Compute values.yaml
-        run: >
+        run: |
           cat > /tmp/values-$IMAGE_VERSION.yaml << EOF
           image: "${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$IMAGE_VERSION"
           rootme_username: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
