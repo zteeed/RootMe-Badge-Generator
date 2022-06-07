@@ -13,18 +13,18 @@ jobs:
     - uses: actions/checkout@v3
     - name: Set output
       run: echo "IMAGE_VERSION=${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    - name: Build and push
-      uses: docker/build-push-action@v3
-      with:
-        push: true
-        tags: ${{ env.IMAGE_VERSION }}
+    #- name: Set up Docker Buildx
+    #  uses: docker/setup-buildx-action@v2
+    #- name: Login to DockerHub
+    #  uses: docker/login-action@v2
+    #  with:
+    #    username: ${{ secrets.DOCKERHUB_USERNAME }}
+    #    password: ${{ secrets.DOCKERHUB_TOKEN }}
+    #- name: Build and push
+    #  uses: docker/build-push-action@v3
+    #  with:
+    #    push: true
+    #    tags: ${{ env.IMAGE_VERSION }}
     - name: Set artifact
       run: echo ${{ env.IMAGE_VERSION }} > version.txt
     - uses: actions/upload-artifact@v2
@@ -39,19 +39,22 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: image-version
+      - name: zzz
+        run: >
+          ls -la
       - name: Compute image version
         run: >
           echo "IMAGE_VERSION=$(cat version.txt)" >> $GITHUB_ENV
       - name: Compute values.yaml
         run: |
-          cat > /tmp/values-$IMAGE_VERSION.yaml << EOF
-          image: "${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$IMAGE_VERSION"
+          cat > /tmp/values.yaml << EOF
+          image: $IMAGE_VERSION
           rootme_username: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
           rootme_password: ${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
           EOF
       - name: Apply helm release
         run: |
-          helm upgrade --install rootme-badge-generator -f /tmp/values-$IMAGE_VERSION.yaml ./charts
+          helm upgrade --install rootme-badge-generator -f /tmp/values.yaml ./charts
         
     
 
