@@ -35,7 +35,7 @@ jobs:
           export IMAGE_VERSION=$(
             curl -s https://registry.hub.docker.com/v1/repositories/${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator/tags \
             | jq -r '.[-1].name'
-          ) && echo $IMAGE_VERSION
+          ) && echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
       - name: Compute values.yaml
         run: |
           cat > /tmp/values-$IMAGE_VERSION.yaml << EOF
