@@ -34,18 +34,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Compute stuff
-        run: >-
+        run: >
           pwd && ls -la
         shell: bash
       - name: Compute image version
-        run: >-
+        run: >
           export IMAGE_VERSION=$(
             curl -s https://registry.hub.docker.com/v1/repositories/${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator/tags
-            |jq -r '.[-1].name'
+            | jq -r '.[-1].name'
           )
         shell: bash
       - name: Compute values.yaml
-        run: >-
+        run: >
           cat > /tmp/values-$IMAGE_VERSION.yaml << EOF
           image: "${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$IMAGE_VERSION"
           rootme_username: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
