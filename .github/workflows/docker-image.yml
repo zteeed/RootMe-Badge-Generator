@@ -14,11 +14,12 @@ jobs:
       uses: tj-actions/changed-files@v22.2
     - name: List all changed files
       run: |       
-        echo ${{ steps.changed-files.outputs.all_changed_files }}
-        echo "---"
         for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
           echo "$file was changed"
         done
+        if [[ $(echo ${{ steps.changed-files.outputs.all_changed_files }}) == "requirements.txt" ]]; then
+          exit 1 # dependabot
+        fi
     - name: Set output
       run: echo "IMAGE_VERSION=${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
     - name: Set up Docker Buildx
