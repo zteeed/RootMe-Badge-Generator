@@ -30,7 +30,7 @@ pillow==9.1.1
     # via -r requirements.in
 python-dotenv==0.20.0
     # via -r requirements.in
-python-magic==0.4.26
+python-magic==0.4.27
     # via -r requirements.in
 requests==2.27.1
     # via -r requirements.in
