@@ -214,7 +214,9 @@ class RMAPI:
         url = f'{self.api_url}/?page=recherche&recherche={username}'
         content = self.http_get(url)
         tree = html.fromstring(content)
-        user_profile_urls = tree.xpath(f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, "{username}")]/@href')
+        user_profile_urls = tree.xpath(
+            f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, "{username}")]/@href'
+        )
         for url_path in user_profile_urls:
             #  check every pages to check if profile page match score
             pass
