@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - master
-    paths:
-      - "!requirements.txt"
-      - "!.github/**"
+    paths-ignore:
+      - "requirements.txt"
+      - ".github/**"
 
 jobs:
   build:
