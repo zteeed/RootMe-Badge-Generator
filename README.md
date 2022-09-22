@@ -46,3 +46,4 @@ docker run -d --restart always -p 5000:80 --name badge_generator zteeed/badge_ge
 
 # Dynamic JS Badge
 ![](./example/screenshot4.png)
+
