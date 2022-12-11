@@ -49,5 +49,7 @@ jobs:
         run: >-
           (docker rm -f rootme || true) && docker run -d --restart always
           -p 0.0.0.0:38084:80 --name badge_generator
+          -e ROOTME_ACCOUNT_USERNAME=${{ secrets.ROOTME_ACCOUNT_USERNAME }}
+          -e ROOTME_ACCOUNT_PASSWORD=${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
           -v /volume1/docker/rootme/storage_clients:/app/storage_clients
           $IMAGE_VERSION
