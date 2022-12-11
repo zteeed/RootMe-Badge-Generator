@@ -44,16 +44,9 @@ jobs:
       - name: Compute image version
         run: >
           echo "IMAGE_VERSION=$(cat version.txt)" >> $GITHUB_ENV
-      - name: Compute values.yaml
-        run: |
-          cat > /tmp/values.yaml << EOF
-          image: ${{ env.IMAGE_VERSION }}
-          rootme_username: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
-          rootme_password: ${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
-          EOF
-      - name: Apply helm release
-        run: |
-          helm upgrade --install rootme-badge-generator -f /tmp/values.yaml ./charts
-        
-    
-
+      - name: Deploy rootme docker container
+        run: >-
+          (docker rm -f rootme || true) && docker run -d --restart always
+          -p 0.0.0.0:38084:80 --name badge_generator
+          -v /volume1/docker/rootme/storage_clients:/app/storage_clients
+          $IMAGE_VERSION
