@@ -77,6 +77,7 @@ class RMAPI:
 
     def __init__(self):
         self.api_url = os.environ.get('API_URL')
+        self.web_url = self.api_url.replace('api.', '')
         self.number_challenges = None
         self.number_users = None
         session = Session()
@@ -211,11 +212,11 @@ class RMAPI:
         if content is not None:
             return url
 
-        url = f'{self.api_url}/?page=recherche&recherche={username}'
+        url = f'{self.web_url}/?page=recherche&recherche={username}'
         content = self.http_get(url)
         tree = html.fromstring(content)
         user_profile_urls = tree.xpath(
-            f'//div[@class="t-body tb-padding"]/ul/li/a[contains(@text, "{username}")]/@href'
+            f'//div[@class="t-body tb-padding"]/ul/li/a[contains(text(), "{username}")]/@href'
         )
         for url_path in user_profile_urls:
             #  check every pages to check if profile page match score
