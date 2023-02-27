@@ -89,7 +89,7 @@ def update_number_rootme_challenges() -> None:
 
 @tl.job(interval=timedelta(days=1))
 def update_number_rootme_users() -> None:
-    app.api.update_number_rootme_challenges()
+    app.api.update_number_rootme_users()
 
 
 def start_tl():

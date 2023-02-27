@@ -84,7 +84,7 @@ class RMAPI:
         retry = Retry(
             total=10,
             backoff_factor=1,
-            status_forcelist=[429],
+            status_forcelist=[429, 500, 502, 503, 504],
         )
         adapter = HTTPAdapter(max_retries=retry, pool_maxsize=100, pool_block=True)
         session.mount('http://', adapter)
