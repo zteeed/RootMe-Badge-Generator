@@ -1,13 +1,15 @@
 import json
 import logging
 import os
+import random
 import sys
+import time
+from dataclasses import dataclass
 from typing import Optional, Tuple
 
 import requests
 from requests import Session
 from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 from lxml import html
 
 
@@ -41,6 +43,96 @@ class HTTPBadStatusCodeError(RuntimeError):
         super().__init__(f'bad http status code {code}')
 
 
+RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+
+
+@dataclass(frozen=True)
+class BackoffConfig:
+    max_attempts: int
+    base_sec: float
+    cap_sec: float
+    timeout: float
+
+
+def _load_backoff_config() -> BackoffConfig:
+    return BackoffConfig(
+        max_attempts=int(os.environ.get('HTTP_MAX_ATTEMPTS', '8')),
+        base_sec=float(os.environ.get('HTTP_BACKOFF_BASE_SEC', '1.0')),
+        cap_sec=float(os.environ.get('HTTP_BACKOFF_MAX_SEC', '60.0')),
+        timeout=float(os.environ.get('HTTP_TIMEOUT_SEC', '60.0')),
+    )
+
+
+def _sleep_backoff(attempt: int, base_sec: float, cap_sec: float) -> None:
+    delay = min(cap_sec, base_sec * (2 ** attempt))
+    jitter = random.uniform(0, max(delay * 0.1, 0.05))
+    time.sleep(delay + jitter)
+
+
+def session_get_with_backoff(session: Session, url: str) -> requests.Response:
+    cfg = _load_backoff_config()
+    last_exc: Optional[BaseException] = None
+    for attempt in range(cfg.max_attempts):
+        try:
+            r = session.get(url, timeout=cfg.timeout)
+        except requests.exceptions.RequestException as exc:
+            last_exc = exc
+            log.log(
+                logging.WARNING,
+                'http_get_retry',
+                extra=dict(url=url, attempt=attempt, error=str(exc)),
+            )
+            if attempt >= cfg.max_attempts - 1:
+                raise
+            _sleep_backoff(attempt, cfg.base_sec, cfg.cap_sec)
+            continue
+
+        if r.status_code in RETRYABLE_STATUS and attempt < cfg.max_attempts - 1:
+            log.log(
+                logging.WARNING,
+                'http_get_status_retry',
+                extra=dict(url=url, attempt=attempt, status_code=r.status_code),
+            )
+            _sleep_backoff(attempt, cfg.base_sec, cfg.cap_sec)
+            continue
+        return r
+    if last_exc:
+        raise last_exc
+    raise RuntimeError('session_get_with_backoff: exhausted attempts without response')
+
+
+def session_post_with_backoff(session: Session, url: str, data: dict) -> requests.Response:
+    cfg = _load_backoff_config()
+    last_exc: Optional[BaseException] = None
+    for attempt in range(cfg.max_attempts):
+        try:
+            r = session.post(url, data=data, timeout=cfg.timeout)
+        except requests.exceptions.RequestException as exc:
+            last_exc = exc
+            log.log(
+                logging.WARNING,
+                'http_post_retry',
+                extra=dict(url=url, attempt=attempt, error=str(exc)),
+            )
+            if attempt >= cfg.max_attempts - 1:
+                raise
+            _sleep_backoff(attempt, cfg.base_sec, cfg.cap_sec)
+            continue
+
+        if r.status_code in RETRYABLE_STATUS and attempt < cfg.max_attempts - 1:
+            log.log(
+                logging.WARNING,
+                'http_post_status_retry',
+                extra=dict(url=url, attempt=attempt, status_code=r.status_code),
+            )
+            _sleep_backoff(attempt, cfg.base_sec, cfg.cap_sec)
+            continue
+        return r
+    if last_exc:
+        raise last_exc
+    raise RuntimeError('session_post_with_backoff: exhausted attempts without response')
+
+
 session = Session()
 
 
@@ -55,7 +147,7 @@ def http_get_url(session: Session, url: str) -> Tuple[Optional[bytes], int]:
     :return: HTML of the page or None
     """
     log.log(logging.INFO, f'http_get', extra=dict(url=url))
-    r = session.get(url)
+    r = session_get_with_backoff(session, url)
 
     if r.status_code == 200:
         log.log(logging.INFO, f'http_get_success', extra=dict(url=url, status_code=r.status_code))
@@ -81,12 +173,7 @@ class RMAPI:
         self.number_challenges = None
         self.number_users = None
         session = Session()
-        retry = Retry(
-            total=10,
-            backoff_factor=1,
-            status_forcelist=[429, 500, 502, 503, 504],
-        )
-        adapter = HTTPAdapter(max_retries=retry, pool_maxsize=100, pool_block=True)
+        adapter = HTTPAdapter(max_retries=0, pool_maxsize=100, pool_block=True)
         session.mount('http://', adapter)
         session.mount('https://', adapter)
         self.session = session
@@ -106,7 +193,7 @@ class RMAPI:
         }
         url = f'{self.api_url}/login'
         log.log(logging.INFO, f'http_post', extra=dict(url=url, payload=payload))
-        r = self.session.post(url, data=payload)
+        r = session_post_with_backoff(self.session, url, payload)
 
         if r.status_code != 200:
             log.log(logging.INFO, f'Authentication failed',
@@ -127,14 +214,14 @@ class RMAPI:
     def update_number_rootme_challenges(self) -> None:
         url = f'{self.api_url}/challenges'
         log.log(logging.INFO, f'http_get', extra=dict(url=url))
-        r = self.session.get(url)
+        r = session_get_with_backoff(self.session, url)
         data = json.loads(r.content)
         count = 0
         while data[-1]['rel'] != 'previous':
             count += 50
             url = f'{self.api_url}/challenges?debut_challenges={count}'
             log.log(logging.INFO, f'http_get', extra=dict(url=url))
-            r = self.session.get(url)
+            r = session_get_with_backoff(self.session, url)
             data = json.loads(r.content)
         self.number_challenges = count + len(data[0])
 
@@ -144,12 +231,12 @@ class RMAPI:
 
         url = f'{self.api_url}/auteurs?debut_auteurs={count}'
         log.log(logging.INFO, f'http_get', extra=dict(url=url, count=count, mini=mini, maxi=maxi))
-        r = self.session.get(url)
+        r = session_get_with_backoff(self.session, url)
         data = json.loads(r.content)
 
         url = f'{self.api_url}/auteurs?debut_auteurs={count - 1}'
         log.log(logging.INFO, f'http_get', extra=dict(url=url, count=count - 1, mini=mini, maxi=maxi))
-        r = self.session.get(url)
+        r = session_get_with_backoff(self.session, url)
         data_previous = json.loads(r.content)
 
         if abs(len(data_previous[0]) - len(data[0])) == 1:

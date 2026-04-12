@@ -46,10 +46,10 @@ jobs:
         run: >
           echo "IMAGE_VERSION=$(cat version.txt)" >> $GITHUB_ENV
       - name: Deploy rootme docker container
-        run: >-
-          (docker rm -f rootme || true) && docker run -d --restart always
-          -p 0.0.0.0:38085:80 --name rootme
-          -e ROOTME_ACCOUNT_USERNAME=${{ secrets.ROOTME_ACCOUNT_USERNAME }}
-          -e ROOTME_ACCOUNT_PASSWORD=${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
-          -v /volume1/docker/rootme/storage_clients:/app/storage_clients
-          $IMAGE_VERSION
+        env:
+          ROOTME_IMAGE: ${{ env.IMAGE_VERSION }}
+          ROOTME_STORAGE_PATH: /volume1/docker/rootme/storage_clients
+          ROOTME_ACCOUNT_USERNAME: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
+          ROOTME_ACCOUNT_PASSWORD: ${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
+        run: |
+          docker compose up -d --pull always --no-build --force-recreate --remove-orphans

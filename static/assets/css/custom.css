@@ -9,3 +9,35 @@
     max-width: 100%;
     max-height: 100%;
 }
+
+/* Loading overlay (SweetAlert2) — indeterminate progress */
+.rm-loading-wrap {
+    margin-top: 1.25em;
+    text-align: center;
+}
+.rm-loading-wrap .fa-spinner {
+    font-size: 1.75em;
+    color: #6272a4;
+}
+.rm-progress-track {
+    height: 6px;
+    background: rgba(98, 114, 164, 0.25);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 1em;
+}
+.rm-progress-bar {
+    height: 100%;
+    width: 35%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #bd93f9, #8be9fd);
+    animation: rm-progress-slide 1.15s ease-in-out infinite;
+}
+@keyframes rm-progress-slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(320%);
+    }
+}

@@ -1,0 +1,24 @@
+# Port 38085 : identique à la pipeline GitHub Actions (.github/workflows/docker-image.yml).
+# Local : docker compose up --build  →  http://localhost:38085
+# Synologie / self-hosted : définir ROOTME_STORAGE_PATH (bind mount), ex. :
+#   ROOTME_STORAGE_PATH=/volume1/docker/rootme/storage_clients
+services:
+  rootme:
+    build: .
+    image: ${ROOTME_IMAGE:-rootme-badge-generator:local}
+    container_name: rootme
+    restart: always
+    ports:
+      - "0.0.0.0:38085:80"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      URL: ${URL:-http://localhost:38085}
+      ROOTME_ACCOUNT_USERNAME: ${ROOTME_ACCOUNT_USERNAME:-}
+      ROOTME_ACCOUNT_PASSWORD: ${ROOTME_ACCOUNT_PASSWORD:-}
+    volumes:
+      - ${ROOTME_STORAGE_PATH:-rootme_storage}:/app/storage_clients
+
+volumes:
+  rootme_storage:

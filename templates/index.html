@@ -40,7 +40,25 @@
 </article>
 <script>
 function generate() {
-	display_sw2("Please wait...", "Generating RootMe Badge", "info");
+	var usernameInput = document.getElementById("username");
+	var username = usernameInput ? usernameInput.value.trim() : "";
+	if (!username) {
+		display_sw2("Please enter a RootMe username.", "Missing username", "warning");
+		return;
+	}
+	Swal.fire({
+		title: "Generating RootMe Badge",
+		type: "info",
+		html:
+			'<p>Fetching profile and building badges…</p>' +
+			'<div class="rm-loading-wrap" role="status" aria-live="polite">' +
+			'<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>' +
+			'<div class="rm-progress-track" role="progressbar" aria-valuetext="Loading">' +
+			'<div class="rm-progress-bar"></div></div></div>',
+		showConfirmButton: false,
+		allowOutsideClick: false,
+		allowEscapeKey: false
+	});
 	document.getElementById("myForm").submit();
 }
 </script>
