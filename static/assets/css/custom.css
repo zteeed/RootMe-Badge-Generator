@@ -29,84 +29,26 @@ body {
     max-height: 100%;
 }
 
-/* Loading overlay (SweetAlert2) — indeterminate progress */
+/* Loading overlay (SweetAlert2) — spinner tourné en JS (voir index.html) : le popup
+   Swal anime son propre transform, ce qui casse souvent les @keyframes sur les enfants. */
 .rm-loading-wrap {
-    margin-top: 1.25em;
+    margin-top: 1.5em;
     text-align: center;
+    line-height: 0;
+    isolation: isolate;
 }
 
-/* Spinner CSS pur (ne dépend pas de font-awesome.min.css) */
+.swal2-container .rm-spinner,
 .rm-spinner {
     display: inline-block;
     box-sizing: border-box;
-    width: 2.25em;
-    height: 2.25em;
-    border: 0.2em solid rgba(98, 114, 164, 0.25);
+    width: 2.5em;
+    height: 2.5em;
+    margin: 0 auto;
+    border: 0.22em solid rgba(98, 114, 164, 0.2);
     border-top-color: #6272a4;
     border-radius: 50%;
-    -webkit-animation: rm-spin 0.75s linear infinite;
-    animation: rm-spin 0.75s linear infinite;
-}
-
-@-webkit-keyframes rm-spin {
-    to {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-@keyframes rm-spin {
-    to {
-        -webkit-transform: rotate(360deg);
-        transform: rotate(360deg);
-    }
-}
-
-.rm-progress-track {
-    height: 6px;
-    background: rgba(98, 114, 164, 0.25);
-    border-radius: 3px;
-    overflow: hidden;
-    margin-top: 1em;
-}
-
-.rm-progress-bar {
-    height: 100%;
-    width: 35%;
-    border-radius: 3px;
-    background: linear-gradient(90deg, #bd93f9, #8be9fd);
-    -webkit-animation: rm-progress-slide 1.15s ease-in-out infinite;
-    animation: rm-progress-slide 1.15s ease-in-out infinite;
-}
-
-@-webkit-keyframes rm-progress-slide {
-    0% {
-        -webkit-transform: translateX(-100%);
-        transform: translateX(-100%);
-    }
-    100% {
-        -webkit-transform: translateX(320%);
-        transform: translateX(320%);
-    }
-}
-
-@keyframes rm-progress-slide {
-    0% {
-        -webkit-transform: translateX(-100%);
-        transform: translateX(-100%);
-    }
-    100% {
-        -webkit-transform: translateX(320%);
-        transform: translateX(320%);
-    }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .rm-spinner,
-    .rm-progress-bar {
-        -webkit-animation-duration: 0.01ms !important;
-        animation-duration: 0.01ms !important;
-        -webkit-animation-iteration-count: 1 !important;
-        animation-iteration-count: 1 !important;
-    }
+    vertical-align: middle;
+    transform: rotate(0deg);
+    will-change: transform;
 }

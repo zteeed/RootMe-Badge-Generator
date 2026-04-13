@@ -47,9 +47,11 @@ def extract_info_username_input(username: str, api: RMAPI) \
 
 
 def extract_data(data: Dict, id_auteur: int, api: RMAPI, url: str) -> Dict:
-    top = max(0.01, 100 * data['position'] / api.number_users)
+    # L’API renvoie parfois position/score en chaînes (JSON SPIP).
+    position = int(data['position'])
+    score = int(data['score'])
+    top = max(0.01, 100 * position / api.number_users)
     top = '{0:.2f}'.format(top)
-    score = data['score']
     username = data['nom']
     profile_page_url = api.get_profile_page_url(username, id_auteur, score)
     return {
@@ -59,7 +61,7 @@ def extract_data(data: Dict, id_auteur: int, api: RMAPI, url: str) -> Dict:
         'avatar_url': api.get_avatar_url(profile_page_url),
         'score': score,
         'rank': api.get_rank(profile_page_url),
-        'ranking': data['position'],
+        'ranking': position,
         'ranking_tot': api.number_users,
         'top': f'{top}%',
         'challenge': {
