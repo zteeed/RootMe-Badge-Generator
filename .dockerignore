@@ -4,7 +4,11 @@ __pycache__
 
 # PyCharm
 .idea/
+
+# Python virtual environments — ne pas envoyer le contexte de build (taille + caches)
 venv/
+.venv/
+.venv-*/
 
 # environment
 .env

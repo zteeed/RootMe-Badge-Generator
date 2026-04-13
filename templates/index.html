@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row">
             <div class="col-4 col-5-large col-12-medium">
-                <span class="image fit"><img src="{{ url_for('static', filename='images/logo.png') }}" alt=""/></span>
+                <span class="image fit"><img src="{{ static_url('images/logo.png') }}" alt=""/></span>
             </div>
             <div class="col-8 col-7-large col-12-medium">
                 <header>
@@ -52,15 +52,20 @@ function generate() {
 		html:
 			'<p>Fetching profile and building badges…</p>' +
 			'<div class="rm-loading-wrap" role="status" aria-live="polite">' +
-			'<span class="rm-spinner" aria-hidden="true"></span></div>',
+			'<span class="rm-spinner" aria-hidden="true"></span>' +
+			'<div class="rm-progress-track" aria-valuemin="0" aria-valuemax="100" role="progressbar" aria-valuenow="0">' +
+			'<div class="rm-progress-fill"></div></div>' +
+			'<p class="rm-progress-hint">Usually ~5–35s depending on API and duplicate accounts.</p>' +
+			'</div>',
 		showConfirmButton: false,
 		allowOutsideClick: false,
 		allowEscapeKey: false,
 		onOpen: function (popup) {
-			// Rotation en requestAnimationFrame : l’animation CSS du .swal2-popup (transform)
-			// empêche souvent les @keyframes rotate sur les enfants (Chrome / Safari).
+			var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+			// Spinner : rotation en JS (SweetAlert2 transform sur le popup casse les keyframes CSS).
 			var el = popup.querySelector(".rm-spinner");
-			if (el && !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+			if (el && !reduceMotion) {
 				var deg = 0;
 				function spin() {
 					if (!el || !el.isConnected) return;
@@ -70,7 +75,33 @@ function generate() {
 				}
 				requestAnimationFrame(spin);
 			}
-			// Laisser le modal peindre avant navigation (POST).
+
+			// Barre indicative : durée fixe calibrée sur les logs (beaucoup d’appels API / homonymes ~30–40s, profil simple ~3–8s).
+			var fill = popup.querySelector(".rm-progress-fill");
+			var track = popup.querySelector(".rm-progress-track");
+			// Phase 1 : 0→88% en RM_PROGRESS_MAIN_MS ms. Phase 2 : 88→97% sur RM_PROGRESS_TAIL_MS (attente longue).
+			var RM_PROGRESS_MAIN_MS = 24000;
+			var RM_PROGRESS_TAIL_MS = 14000;
+			var t0 = performance.now();
+			function tickProgress() {
+				if (!fill || !fill.isConnected) return;
+				var elapsed = performance.now() - t0;
+				var pct;
+				if (reduceMotion) {
+					pct = 0;
+				} else if (elapsed < RM_PROGRESS_MAIN_MS) {
+					pct = (elapsed / RM_PROGRESS_MAIN_MS) * 88;
+				} else {
+					var tail = elapsed - RM_PROGRESS_MAIN_MS;
+					pct = 88 + Math.min(9, (tail / RM_PROGRESS_TAIL_MS) * 9);
+				}
+				if (pct > 97) pct = 97;
+				fill.style.width = pct.toFixed(2) + "%";
+				if (track) track.setAttribute("aria-valuenow", String(Math.round(pct)));
+				requestAnimationFrame(tickProgress);
+			}
+			if (fill && !reduceMotion) requestAnimationFrame(tickProgress);
+
 			setTimeout(function () {
 				document.getElementById("myForm").submit();
 			}, 80);

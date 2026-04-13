@@ -47,10 +47,24 @@ def extract_info_username_input(username: str, api: RMAPI) \
 
 
 def extract_data(data: Dict, id_auteur: int, api: RMAPI, url: str) -> Dict:
-    # L’API renvoie parfois position/score en chaînes (JSON SPIP).
-    position = int(data['position'])
-    score = int(data['score'])
-    top = max(0.01, 100 * position / api.number_users)
+    nu = api.number_users
+    if nu is None or nu < 1:
+        raise ValueError(
+            'Root-Me total user count is unavailable (api.number_users); '
+            'cannot compute ranking. Check API initialization.'
+        )
+
+    pos_raw = data.get('position')
+    # Score 0 : l’API renvoie souvent "position": "" → dernier rang = nombre total d’auteurs (pas de valeur fictive type 1).
+    if pos_raw is None or pos_raw == '':
+        position = nu
+    else:
+        position = int(pos_raw)
+
+    score_raw = data.get('score')
+    score = 0 if score_raw in (None, '') else int(score_raw)
+
+    top = max(0.01, 100 * position / nu)
     top = '{0:.2f}'.format(top)
     username = data['nom']
     profile_page_url = api.get_profile_page_url(username, id_auteur, score)
@@ -62,10 +76,10 @@ def extract_data(data: Dict, id_auteur: int, api: RMAPI, url: str) -> Dict:
         'score': score,
         'rank': api.get_rank(profile_page_url),
         'ranking': position,
-        'ranking_tot': api.number_users,
+        'ranking_tot': nu,
         'top': f'{top}%',
         'challenge': {
-            'solved': len(data['validations']),
+            'solved': len(data.get('validations') or []),
             'total': api.number_challenges
         }
     }

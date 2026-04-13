@@ -4,7 +4,11 @@ __pycache__
 
 # PyCharm
 .idea/
+
+# Python virtual environments (venv, .venv, .venv-pc pour pip-compile, etc.)
 venv/
+.venv/
+.venv-*/
 
 # environment
 .env

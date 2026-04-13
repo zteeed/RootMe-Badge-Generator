@@ -10,20 +10,20 @@
     <meta charset="utf-8"/>
     <meta name="author" content="Aurélien Duboc <aurelien[At]duboc.xyz>">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/main.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/sweetalert2.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/custom.css') }}"/>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo.png') }}"/>
+    <link rel="stylesheet" href="{{ static_url('assets/css/main.css') }}"/>
+    <link rel="stylesheet" href="{{ static_url('assets/css/sweetalert2.css') }}"/>
+    <link rel="stylesheet" href="{{ static_url('assets/css/custom.css') }}"/>
+    <link rel="icon" type="image/png" href="{{ static_url('images/logo.png') }}"/>
 </head>
 
 <!-- Scripts -->
-<script src="{{ url_for('static', filename='assets/js/jquery.min.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/jquery.scrolly.min.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/browser.min.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/breakpoints.min.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/main.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/sweetalert2.js') }}"></script>
-<script src="{{ url_for('static', filename='assets/js/custom.js') }}"></script>
+<script src="{{ static_url('assets/js/jquery.min.js') }}"></script>
+<script src="{{ static_url('assets/js/jquery.scrolly.min.js') }}"></script>
+<script src="{{ static_url('assets/js/browser.min.js') }}"></script>
+<script src="{{ static_url('assets/js/breakpoints.min.js') }}"></script>
+<script src="{{ static_url('assets/js/main.js') }}"></script>
+<script src="{{ static_url('assets/js/sweetalert2.js') }}"></script>
+<script src="{{ static_url('assets/js/custom.js') }}"></script>
 
 <!-- Body -->
 <body class="is-preload">
@@ -41,16 +41,14 @@
 
 <!-- Footer (barre fixe en bas de l’écran, voir custom.css) -->
 <article id="site-footer" class="wrapper style4 rm-site-footer">
-    <div class="container medium"></div>
+    <div class="container"></div>
 </article>
 
-{% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
   {% for category, message in messages %}
     <script>display_sw2(`{{ message | safe }}`, "Information", "{{ category }}");</script>
   {% endfor %}
 {% endif %}
-{% endwith %}
 
 </body>
 </html>

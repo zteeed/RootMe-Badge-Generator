@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block content %}
 <!-- Server -->
-<link rel="stylesheet" href="{{ url_for('static', filename='assets/css/dracula.css') }}"/>
-<script src="{{ url_for('static', filename='assets/js/ajax/libs/highlight.js/10.1.2/highlight.min.js') }}"></script>
+<link rel="stylesheet" href="{{ static_url('assets/css/dracula.css') }}"/>
+<script src="{{ static_url('assets/js/ajax/libs/highlight.js/10.1.2/highlight.min.js') }}"></script>
 <script>hljs.initHighlightingOnLoad();</script>
 <article id="work" class="wrapper style2">
     <div class="container">

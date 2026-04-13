@@ -1,8 +1,14 @@
-flask
-flask-cors
+# Top-level dependencies — pip-compile avec le même Python que le Dockerfile (3.14), ex. :
+#   docker run --rm -v "$PWD":/app -w /app python:3.14-slim-bookworm bash -c \
+#     "pip install pip-tools && pip-compile --upgrade --resolver=backtracking -o requirements.txt requirements.in"
+fastapi
+uvicorn[standard]
+jinja2
+python-multipart
+python-dotenv
 lxml
 pillow
-python-dotenv
 python-magic
 requests
 timeloop
+werkzeug
