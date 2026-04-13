@@ -14,7 +14,7 @@ services:
       - "0.0.0.0:38085:80"
     # Variables : fichier .env à la racine (interpolation ${...}, tous les compose) + env du shell (CI).
     environment:
-      URL: ${URL:-http://localhost:38085}
+      URL: ${URL:-https://root-me-badge.cloud.duboc.xyz}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       ROOTME_ACCOUNT_USERNAME: ${ROOTME_ACCOUNT_USERNAME:-}
       ROOTME_ACCOUNT_PASSWORD: ${ROOTME_ACCOUNT_PASSWORD:-}
