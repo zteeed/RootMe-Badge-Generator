@@ -10,9 +10,7 @@ services:
     restart: always
     ports:
       - "0.0.0.0:38085:80"
-    env_file:
-      - path: .env
-        required: false
+    # Variables : fichier .env à la racine (interpolation ${...}, tous les compose) + env du shell (CI).
     environment:
       URL: ${URL:-http://localhost:38085}
       ROOTME_ACCOUNT_USERNAME: ${ROOTME_ACCOUNT_USERNAME:-}
