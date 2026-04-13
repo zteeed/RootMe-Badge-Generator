@@ -1,8 +1,8 @@
+import asyncio
 import json
 import logging
 import os
 from contextlib import asynccontextmanager
-from datetime import timedelta
 from pathlib import Path
 from typing import Optional
 
@@ -12,7 +12,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
-from timeloop import Timeloop
 from werkzeug.utils import secure_filename
 
 from logging_config import setup_logging
@@ -25,40 +24,57 @@ setup_logging()
 log = logging.getLogger(__name__)
 
 BASE_DIR = Path(__file__).resolve().parent
-URL = os.environ.get("URL")
-tl = Timeloop()
-api: Optional[RMAPI] = None
-
-
-def static_url(filename: str) -> str:
-    return "/static/" + filename.lstrip("/")
-
+DAILY_REFRESH_INTERVAL = 24 * 60 * 60
 
 templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
-templates.env.globals["static_url"] = static_url
+templates.env.globals["static_url"] = lambda f: "/static/" + f.lstrip("/")
 
 
-@tl.job(interval=timedelta(days=1))
-def update_number_rootme_challenges() -> None:
-    api.update_number_rootme_challenges()
+# ---------------------------------------------------------------------------
+# Scheduled background tasks (pure asyncio, no threads)
+# ---------------------------------------------------------------------------
+
+async def _daily_refresh(app_instance: FastAPI) -> None:
+    while True:
+        await asyncio.sleep(DAILY_REFRESH_INTERVAL)
+        rm_api = app_instance.state.api
+        if rm_api is None:
+            continue
+        try:
+            await asyncio.to_thread(rm_api.update_number_rootme_challenges)
+            await asyncio.to_thread(rm_api.update_number_rootme_users)
+            log.info("Daily stats refresh completed")
+        except Exception:
+            log.exception("Daily stats refresh failed")
 
 
-@tl.job(interval=timedelta(days=1))
-def update_number_rootme_users() -> None:
-    api.update_number_rootme_users()
-
+# ---------------------------------------------------------------------------
+# Lifespan
+# ---------------------------------------------------------------------------
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global api
-    log.info("Starting RootMe Badge Generator (FastAPI)")
-    api = RMAPI()
-    app.state.api = api
-    tl.start(block=False)
-    log.info("Timeloop started (daily Root-Me stats refresh)")
+    log.info("Starting RootMe Badge Generator")
+    app.state.api = None
+    app.state.api_error = None
+
+    try:
+        rm_api = await asyncio.to_thread(RMAPI)
+        app.state.api = rm_api
+        log.info("Root-Me API client initialized")
+    except Exception as exc:
+        log.exception("Root-Me API client init failed")
+        app.state.api_error = str(exc)
+
+    refresh_task = asyncio.create_task(_daily_refresh(app))
     yield
+    refresh_task.cancel()
     log.info("Application shutdown")
 
+
+# ---------------------------------------------------------------------------
+# App setup
+# ---------------------------------------------------------------------------
 
 app = FastAPI(title="RootMe Badge Generator", lifespan=lifespan)
 app.add_middleware(
@@ -70,72 +86,102 @@ app.add_middleware(
 )
 
 
+# ---------------------------------------------------------------------------
+# Response helpers
+# ---------------------------------------------------------------------------
+
+def _render_index(request: Request, messages: Optional[list] = None):
+    return templates.TemplateResponse("index.html", {"request": request, "messages": messages or []})
+
+
+def _render_error(request: Request, message: str):
+    return _render_index(request, [("error", message)])
+
+
+def _get_api_or_error(request: Request):
+    rm_api = request.app.state.api
+    if rm_api is not None:
+        return rm_api, None
+    details = request.app.state.api_error
+    msg = "Service is starting and connecting to Root-Me API. Please retry in a few seconds."
+    if details:
+        msg = f"{msg} Last error: {details}"
+    return None, _render_error(request, msg)
+
+
+# ---------------------------------------------------------------------------
+# Badge generation logic
+# ---------------------------------------------------------------------------
+
+def _fetch_user_data(rm_api: RMAPI, username: str, id_auteur: int) -> dict:
+    auteurs_url = f"{rm_api.api_url}/auteurs/{id_auteur}"
+    content = rm_api.http_get(auteurs_url)
+    if content is None:
+        return {
+            "nom": username,
+            "position": rm_api.number_users,
+            "score": 0,
+            "validations": [],
+        }
+    return json.loads(content)
+
+
+def _render_badge(request: Request, data: dict, save_paths: list, js_file_path):
+    return templates.TemplateResponse(
+        "badge.html",
+        {
+            "request": request,
+            "data": data,
+            "save_paths": save_paths,
+            "js_file_path": js_file_path,
+            "messages": [],
+        },
+    )
+
+
+def _handle_badge_request(request: Request, rm_api: RMAPI, username: str):
+    url = os.environ.get("URL")
+
+    username, id_auteur, flash_message, flash_type = extract_info_username_input(username, rm_api)
+    if flash_message is not None:
+        return _render_index(request, [(flash_type, flash_message)])
+
+    raw_data = _fetch_user_data(rm_api, username, id_auteur)
+    data = extract_data(raw_data, id_auteur, rm_api, url)
+
+    save_paths, folder_path, avatar_path = make_storage(rm_api, data)
+    data["avatar_url"] = f"{url}/{avatar_path}"
+
+    dynamic_js_badge = templates.env.get_template("dynamic-js-badge.html").render(data=data)
+    js_file_path = make_storage_js(dynamic_js_badge, folder_path)
+
+    return _render_badge(request, data, save_paths, js_file_path)
+
+
+# ---------------------------------------------------------------------------
+# Routes
+# ---------------------------------------------------------------------------
+
 @app.get("/", response_class=HTMLResponse)
 async def index_get(request: Request):
-    return templates.TemplateResponse(
-        "index.html",
-        {"request": request, "messages": []},
-    )
+    return _render_index(request)
 
 
 @app.post("/", response_class=HTMLResponse)
 async def index_post(request: Request, username: Optional[str] = Form(None)):
     if username is None:
-        return templates.TemplateResponse(
-            "index.html",
-            {
-                "request": request,
-                "messages": [("error", "A wrong form has been sent.")],
-            },
-        )
+        return _render_error(request, "A wrong form has been sent.")
 
-    username = (username or "").strip()
+    username = username.strip()
     if not username:
-        return templates.TemplateResponse(
-            "index.html",
-            {"request": request, "messages": [("error", "Username is empty")]},
-        )
+        return _render_error(request, "Username is empty")
 
-    rm_api = request.app.state.api
+    rm_api, error_response = _get_api_or_error(request)
+    if error_response:
+        return error_response
+
     try:
-        username, id_auteur, flash_message, flash_type = extract_info_username_input(
-            username, rm_api
-        )
-        if flash_message is not None and flash_type is not None:
-            return templates.TemplateResponse(
-                "index.html",
-                {"request": request, "messages": [(flash_type, flash_message)]},
-            )
-
-        auteurs_url = f"{rm_api.api_url}/auteurs/{id_auteur}"
-        content = rm_api.http_get(auteurs_url)
-        if content is None:
-            data = {
-                "nom": username,
-                "position": rm_api.number_users,
-                "score": 0,
-                "validations": [],
-            }
-        else:
-            data = json.loads(content)
-        data = extract_data(data, id_auteur, rm_api, URL)
-
-        save_paths, folder_path, avatar_path = make_storage(rm_api, data)
-        data["avatar_url"] = f"{URL}/{avatar_path}"
-        dynamic_js_badge = templates.env.get_template("dynamic-js-badge.html").render(
-            data=data
-        )
-        js_file_path = make_storage_js(dynamic_js_badge, folder_path)
-        return templates.TemplateResponse(
-            "badge.html",
-            {
-                "request": request,
-                "data": data,
-                "save_paths": save_paths,
-                "js_file_path": js_file_path,
-                "messages": [],
-            },
-        )
+        return _handle_badge_request(request, rm_api, username)
     except HTTPBadStatusCodeError as err:
         if err.code == 429:
             msg = (
@@ -144,15 +190,9 @@ async def index_post(request: Request, username: Optional[str] = Form(None)):
             )
         else:
             msg = f"Root-Me API error (HTTP {err.code})."
-        return templates.TemplateResponse(
-            "index.html",
-            {"request": request, "messages": [("error", msg)]},
-        )
+        return _render_error(request, msg)
     except ValueError as err:
-        return templates.TemplateResponse(
-            "index.html",
-            {"request": request, "messages": [("error", str(err))]},
-        )
+        return _render_error(request, str(err))
 
 
 @app.get("/storage_server/{filename}")
@@ -171,9 +211,7 @@ async def serve_files_clients(folder: str, filename: str):
     path = BASE_DIR / "storage_clients" / folder / filename
     if not path.is_file():
         raise HTTPException(status_code=404)
-    media_type = None
-    if filename == "badge.js":
-        media_type = "text/javascript"
+    media_type = "text/javascript" if filename == "badge.js" else None
     return FileResponse(path, media_type=media_type)
 
 

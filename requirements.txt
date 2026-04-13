@@ -56,8 +56,6 @@ requests==2.33.1
     # via -r requirements.in
 starlette==1.0.0
     # via fastapi
-timeloop==1.0.2
-    # via -r requirements.in
 typing-extensions==4.15.0
     # via
     #   fastapi

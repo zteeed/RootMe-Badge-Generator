@@ -10,5 +10,4 @@ lxml
 pillow
 python-magic
 requests
-timeloop
 werkzeug
