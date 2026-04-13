@@ -91,7 +91,7 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 
 def _render_index(request: Request, messages: Optional[list] = None):
-    return templates.TemplateResponse("index.html", {"request": request, "messages": messages or []})
+    return templates.TemplateResponse(request, "index.html", {"messages": messages or []})
 
 
 def _render_error(request: Request, message: str):
@@ -128,9 +128,9 @@ def _fetch_user_data(rm_api: RMAPI, username: str, id_auteur: int) -> dict:
 
 def _render_badge(request: Request, data: dict, save_paths: list, js_file_path):
     return templates.TemplateResponse(
+        request,
         "badge.html",
         {
-            "request": request,
             "data": data,
             "save_paths": save_paths,
             "js_file_path": js_file_path,
