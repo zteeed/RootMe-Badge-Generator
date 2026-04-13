@@ -51,5 +51,16 @@ jobs:
           ROOTME_STORAGE_PATH: /volume1/docker/rootme/storage_clients
           ROOTME_ACCOUNT_USERNAME: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
           ROOTME_ACCOUNT_PASSWORD: ${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
+          PUBLIC_PROXY_POOL: ${{ secrets.PUBLIC_PROXY_POOL }}
         run: |
-          docker compose up -d --pull always --no-build --force-recreate --remove-orphans
+          set -e
+          if command -v docker-compose >/dev/null 2>&1; then
+            docker-compose pull
+            docker-compose up -d --no-build --force-recreate --remove-orphans
+          elif docker compose version >/dev/null 2>&1; then
+            docker compose pull
+            docker compose up -d --no-build --force-recreate --remove-orphans
+          else
+            echo "Neither docker-compose nor 'docker compose' (V2 plugin) is available." >&2
+            exit 1
+          fi

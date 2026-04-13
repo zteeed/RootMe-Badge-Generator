@@ -5,7 +5,7 @@ import random
 import sys
 import time
 from dataclasses import dataclass
-from typing import Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 import requests
 from requests import Session
@@ -44,6 +44,43 @@ class HTTPBadStatusCodeError(RuntimeError):
 
 
 RETRYABLE_STATUS = frozenset({429, 500, 502, 503, 504})
+
+
+def _normalize_proxy_entry(entry: str) -> Optional[str]:
+    """Build an HTTP(S) proxy URL for requests from one pool entry."""
+    entry = entry.strip()
+    if not entry:
+        return None
+    if '://' in entry:
+        return entry
+    default_port = os.environ.get('PUBLIC_PROXY_DEFAULT_PORT', '8080')
+    # host:port (IPv4 or hostname); IPv6 should use a full URL with brackets.
+    if entry.count(':') == 1 and '[' not in entry:
+        return f'http://{entry}'
+    return f'http://{entry}:{default_port}'
+
+
+def _proxy_urls_from_pool() -> List[str]:
+    raw = (os.environ.get('PUBLIC_PROXY_POOL') or '').strip()
+    if not raw:
+        return []
+    urls: List[str] = []
+    for part in raw.split(','):
+        u = _normalize_proxy_entry(part)
+        if u:
+            urls.append(u)
+    return urls
+
+
+def _random_session_proxies() -> Optional[Dict[str, str]]:
+    """Pick one random proxy from PUBLIC_PROXY_POOL for the whole Session (stable cookies)."""
+    urls = _proxy_urls_from_pool()
+    if not urls:
+        return None
+    chosen = random.choice(urls)
+    safe = chosen.split('@')[-1] if '@' in chosen else chosen
+    log.log(logging.INFO, 'proxy_selected', extra=dict(proxy=safe))
+    return {'http': chosen, 'https': chosen}
 
 
 @dataclass(frozen=True)
@@ -177,6 +214,9 @@ class RMAPI:
         session.mount('http://', adapter)
         session.mount('https://', adapter)
         self.session = session
+        proxies = _random_session_proxies()
+        if proxies:
+            self.session.proxies.update(proxies)
         self.session.headers = {
             "User-Agent": "curl/7.58.0",
         }
