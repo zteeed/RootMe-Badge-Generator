@@ -362,16 +362,19 @@ class RMAPI:
     def get_avatar_url(self, profile_page_url: str) -> str:
         content = self.http_get(profile_page_url)
         tree = html.fromstring(content)
-        result = tree.xpath('//h1/img[@itemprop="image"]/@src')
-        return f"{self.api_url}/{result[0]}"
+        for xpath in (
+            '//h1/img[@itemprop="image"]/@src',
+            '//img[starts-with(@src, "IMG/logo/auton")]/@src',
+        ):
+            result = tree.xpath(xpath)
+            if result:
+                return f"{self.api_url}/{result[0]}"
+        raise ValueError(f"Avatar not found on {profile_page_url}")
 
     def get_rank(self, profile_page_url: str) -> str:
         content = self.http_get(profile_page_url)
         tree = html.fromstring(content)
-        result = tree.xpath(
-            '//img[starts-with(@src, "squelettes/img/rang")]/../../../'
-            'tr[@style="border: 1px #2ba6cb solid"]/td/img/@title'
-        )[0]
-        if not result:
+        results = tree.xpath('//img[starts-with(@src, "squelettes/img/rang")]/@title')
+        if not results or not results[0].strip():
             return "visitor"
-        return result.strip()
+        return results[0].strip()
