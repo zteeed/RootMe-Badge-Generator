@@ -9,7 +9,7 @@ from werkzeug.utils import secure_filename
 from timeloop import Timeloop
 
 from config import Config
-from src.http_client import RMAPI
+from src.http_client import HTTPBadStatusCodeError, RMAPI
 from src.parser import extract_data, extract_info_username_input
 from src.storage import make_storage, make_storage_js
 
@@ -38,32 +38,43 @@ def index():
         flash('Username is empty', 'error')
         return render_template('index.html')
 
-    username, id_auteur, flash_message, flash_type = extract_info_username_input(username, app.api)
-    if flash_message is not None and flash_type is not None:  # username input is not related to a real RootMe account
-        flash(f'{flash_message}', flash_type)
+    try:
+        username, id_auteur, flash_message, flash_type = extract_info_username_input(username, app.api)
+        if flash_message is not None and flash_type is not None:  # username input is not related to a real RootMe account
+            flash(f'{flash_message}', flash_type)
+            return render_template('index.html')
+
+        url = f'{app.api.api_url}/auteurs/{id_auteur}'
+        content = app.api.http_get(url)
+        if content is None:  # account exists but has a score equal to zero
+            data = {
+                'nom': username,
+                'position': app.api.number_users,
+                'score': 0,
+                'validations': []
+            }
+        else:
+            data = json.loads(content)
+        data = extract_data(data, id_auteur, app.api, URL)
+
+        # store static png badges
+        save_paths, folder_path, avatar_path = make_storage(app.api, data)
+        # update avatar_url with local url
+        data['avatar_url'] = f'{URL}/{avatar_path}'
+        # store dynamic js badge as js script
+        dynamic_js_badge = render_template('dynamic-js-badge.html', data=data)
+        js_file_path = make_storage_js(dynamic_js_badge, folder_path)
+        return render_template('badge.html', data=data, save_paths=save_paths, js_file_path=js_file_path)
+    except HTTPBadStatusCodeError as err:
+        if err.code == 429:
+            flash(
+                'Root-Me API rate limit (HTTP 429). Add ROOTME_API_KEY from your account preferences '
+                '(see api.www.root-me.org docs), increase ROOTME_MIN_REQUEST_INTERVAL_SEC, or retry later.',
+                'error',
+            )
+        else:
+            flash(f'Root-Me API error (HTTP {err.code}).', 'error')
         return render_template('index.html')
-
-    url = f'{app.api.api_url}/auteurs/{id_auteur}'
-    content = app.api.http_get(url)
-    if content is None:  # account exists but has a score equal to zero
-        data = {
-            'nom': username,
-            'position': app.api.number_users,
-            'score': 0,
-            'validations': []
-        }
-    else:
-        data = json.loads(content)
-    data = extract_data(data, id_auteur, app.api, URL)
-
-    # store static png badges
-    save_paths, folder_path, avatar_path = make_storage(app.api, data)
-    # update avatar_url with local url
-    data['avatar_url'] = f'{URL}/{avatar_path}'
-    # store dynamic js badge as js script
-    dynamic_js_badge = render_template('dynamic-js-badge.html', data=data)
-    js_file_path = make_storage_js(dynamic_js_badge, folder_path)
-    return render_template('badge.html', data=data, save_paths=save_paths, js_file_path=js_file_path)
 
 
 @app.route('/storage_server/<string:filename>')

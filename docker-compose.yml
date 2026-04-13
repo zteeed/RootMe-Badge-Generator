@@ -15,6 +15,7 @@ services:
       URL: ${URL:-http://localhost:38085}
       ROOTME_ACCOUNT_USERNAME: ${ROOTME_ACCOUNT_USERNAME:-}
       ROOTME_ACCOUNT_PASSWORD: ${ROOTME_ACCOUNT_PASSWORD:-}
+      ROOTME_API_KEY: ${ROOTME_API_KEY:-}
       PUBLIC_PROXY_POOL: ${PUBLIC_PROXY_POOL:-}
     volumes:
       - ${ROOTME_STORAGE_PATH:-rootme_storage}:/app/storage_clients

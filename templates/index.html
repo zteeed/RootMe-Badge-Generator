@@ -52,14 +52,20 @@ function generate() {
 		html:
 			'<p>Fetching profile and building badges…</p>' +
 			'<div class="rm-loading-wrap" role="status" aria-live="polite">' +
-			'<i class="fa fa-spinner fa-spin" aria-hidden="true"></i>' +
+			'<span class="rm-spinner" aria-hidden="true"></span>' +
 			'<div class="rm-progress-track" role="progressbar" aria-valuetext="Loading">' +
 			'<div class="rm-progress-bar"></div></div></div>',
 		showConfirmButton: false,
 		allowOutsideClick: false,
-		allowEscapeKey: false
+		allowEscapeKey: false,
+		onOpen: function () {
+			// Ne pas submit() tout de suite : la navigation coupait le paint du modal
+			// et figeait les animations CSS avant le premier frame.
+			setTimeout(function () {
+				document.getElementById("myForm").submit();
+			}, 80);
+		}
 	});
-	document.getElementById("myForm").submit();
 }
 </script>
 {% endblock %}

@@ -51,6 +51,7 @@ jobs:
           ROOTME_STORAGE_PATH: /volume1/docker/rootme/storage_clients
           ROOTME_ACCOUNT_USERNAME: ${{ secrets.ROOTME_ACCOUNT_USERNAME }}
           ROOTME_ACCOUNT_PASSWORD: ${{ secrets.ROOTME_ACCOUNT_PASSWORD }}
+          ROOTME_API_KEY: ${{ secrets.ROOTME_API_KEY }}
           PUBLIC_PROXY_POOL: ${{ secrets.PUBLIC_PROXY_POOL }}
         run: |
           set -e

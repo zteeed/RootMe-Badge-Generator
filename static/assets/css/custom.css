@@ -1,3 +1,22 @@
+/* Barre du bas collée au viewport (comme #nav en haut) */
+.rm-site-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    z-index: 9999;
+    margin: 0;
+    /* Remplace le padding 3em de .wrapper pour une vraie barre fine */
+    padding: 0.65em 0;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+}
+
+body {
+    /* Évite que le dernier contenu passe sous la barre fixe */
+    padding-bottom: 3rem;
+}
+
 .show_js_badge {
   margin-top: 50px;
   position: relative;
@@ -15,10 +34,34 @@
     margin-top: 1.25em;
     text-align: center;
 }
-.rm-loading-wrap .fa-spinner {
-    font-size: 1.75em;
-    color: #6272a4;
+
+/* Spinner CSS pur (ne dépend pas de font-awesome.min.css) */
+.rm-spinner {
+    display: inline-block;
+    box-sizing: border-box;
+    width: 2.25em;
+    height: 2.25em;
+    border: 0.2em solid rgba(98, 114, 164, 0.25);
+    border-top-color: #6272a4;
+    border-radius: 50%;
+    -webkit-animation: rm-spin 0.75s linear infinite;
+    animation: rm-spin 0.75s linear infinite;
 }
+
+@-webkit-keyframes rm-spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes rm-spin {
+    to {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg);
+    }
+}
+
 .rm-progress-track {
     height: 6px;
     background: rgba(98, 114, 164, 0.25);
@@ -26,18 +69,44 @@
     overflow: hidden;
     margin-top: 1em;
 }
+
 .rm-progress-bar {
     height: 100%;
     width: 35%;
     border-radius: 3px;
     background: linear-gradient(90deg, #bd93f9, #8be9fd);
+    -webkit-animation: rm-progress-slide 1.15s ease-in-out infinite;
     animation: rm-progress-slide 1.15s ease-in-out infinite;
 }
-@keyframes rm-progress-slide {
+
+@-webkit-keyframes rm-progress-slide {
     0% {
+        -webkit-transform: translateX(-100%);
         transform: translateX(-100%);
     }
     100% {
+        -webkit-transform: translateX(320%);
         transform: translateX(320%);
+    }
+}
+
+@keyframes rm-progress-slide {
+    0% {
+        -webkit-transform: translateX(-100%);
+        transform: translateX(-100%);
+    }
+    100% {
+        -webkit-transform: translateX(320%);
+        transform: translateX(320%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rm-spinner,
+    .rm-progress-bar {
+        -webkit-animation-duration: 0.01ms !important;
+        animation-duration: 0.01ms !important;
+        -webkit-animation-iteration-count: 1 !important;
+        animation-iteration-count: 1 !important;
     }
 }
