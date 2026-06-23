@@ -13,7 +13,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set output
       run: echo "IMAGE_VERSION=${{ secrets.DOCKERHUB_USERNAME }}/rootme-badge-generator:$(date +%Y-%m-%d-%H-%M-%S)" >> $GITHUB_ENV
     - name: Set up Docker Buildx
@@ -38,7 +38,7 @@ jobs:
     needs: build
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: actions/download-artifact@v8
         with:
           name: image-version
